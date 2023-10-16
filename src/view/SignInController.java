@@ -37,9 +37,7 @@ public class SignInController {
     private static final Logger LOGGER = Logger.getLogger("SignInController.class");
 
     @FXML
-    private TextField textFieldUser;
-    @FXML
-    private TextField textFieldPassword;
+    private TextField textFieldUser,  textFieldPassword;
     @FXML
     private PasswordField password;
     @FXML
@@ -66,7 +64,7 @@ public class SignInController {
     public void setStage(Stage stage) {
         this.stage = stage;
     }
-
+    
     /**
      * Method that initialises the window.
      *
@@ -82,7 +80,7 @@ public class SignInController {
         // HyperLnk //
         //Accion de dirigir a la ventana de SignUp
         hyperLinkSignUp.setOnAction(event -> SignUp());
-
+        
         // USERNAME TEXT FIELD //
         // Comprobar si el texto cambia
         textFieldUser.setOnKeyTyped(this::textChanged);

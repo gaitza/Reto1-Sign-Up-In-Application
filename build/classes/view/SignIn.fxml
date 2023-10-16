@@ -14,7 +14,7 @@
 <?import javafx.scene.text.Font?>
 <?import javafx.scene.text.Text?>
 
-<Pane prefHeight="500.0" prefWidth="900.0" style="-fx-background-color: FFFFFF;" xmlns="http://javafx.com/javafx/9.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="view.SignInController">
+<Pane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="500.0" prefWidth="900.0" style="-fx-background-color: FFFFFF;" xmlns="http://javafx.com/javafx/9.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="view.SignInController">
    <children>
       <ImageView fitHeight="500.0" fitWidth="378.0" layoutX="67.0" layoutY="76.0" pickOnBounds="true" preserveRatio="true">
          <image>
@@ -54,7 +54,7 @@
             <Font name="Rockwell" size="14.0" />
          </font>
       </Label>
-      <Hyperlink fx:id="hyperLinkSignUp" layoutX="714.0" layoutY="303.0" text="Click here" />
+      <Hyperlink fx:id="hyperLinkSignUp" layoutX="712.0" layoutY="301.0" text="Click here" />
       <Button fx:id="buttonSignIn" layoutX="609.0" layoutY="384.0" mnemonicParsing="false" prefHeight="34.0" prefWidth="191.0" style="-fx-background-color: #56BFAC;" text="Sign In">
          <cursor>
            
