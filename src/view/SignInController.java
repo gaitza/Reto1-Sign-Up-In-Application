@@ -25,7 +25,6 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Line;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
-
 /**
  *
  * @author bayro
@@ -77,6 +76,7 @@ public class SignInController {
 
         stage.setTitle("SignIn");
         stage.setResizable(false);
+          
         // HyperLnk //
         //Accion de dirigir a la ventana de SignUp
         hyperLinkSignUp.setOnAction(event -> SignUp());
@@ -87,7 +87,7 @@ public class SignInController {
         // Comprobacion del cambio de foco en el campo de texto
         textFieldUser.focusedProperty().addListener(this::focusedChange);
         textFieldUser.setOnKeyTyped(this::updateLabel);
-
+        
         // PASSWORD FIELD //
         // Comprobar si el texto cambia
         password.setOnKeyReleased(this::copyPassword);

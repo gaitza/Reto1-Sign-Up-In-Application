@@ -26,12 +26,12 @@
             <Image url="@../resources/Mobile%20login-amico%20(1).png" />
          </image>
       </ImageView>
-      <TextField fx:id="textFieldUser" layoutX="625.0" layoutY="119.0" prefHeight="34.0" prefWidth="148.0" promptText="PhoneNumber" style="-fx-background-color: FFFFFF;" />
+      <TextField fx:id="textFieldPhone" layoutX="625.0" layoutY="119.0" prefHeight="34.0" prefWidth="148.0" promptText="PhoneNumber" style="-fx-background-color: FFFFFF;" />
       <TextField fx:id="textFieldEmail" layoutX="560.0" layoutY="18.0" prefHeight="34.0" prefWidth="216.0" promptText="Email" style="-fx-background-color: FFFFFF;" />
       <TextField fx:id="textFieldName" layoutX="559.0" layoutY="70.0" prefHeight="34.0" prefWidth="216.0" promptText="Name" style="-fx-background-color: FFFFFF;" />
-      <Line endX="100.0" layoutX="665.0" layoutY="153.0" startX="-100.0" />
-      <Line endX="100.0" layoutX="666.0" layoutY="343.0" startX="-100.0" />
-      <ImageView fitHeight="34.0" fitWidth="41.0" layoutX="524.0" layoutY="126.0" pickOnBounds="true" preserveRatio="true">
+      <Line fx:id="lineInvalidPhone" endX="100.0" layoutX="665.0" layoutY="153.0" startX="-100.0" />
+      <Line fx:id="lineInvalidPassword" endX="100.0" layoutX="666.0" layoutY="343.0" startX="-100.0" />
+      <ImageView fitHeight="34.0" fitWidth="41.0" layoutX="521.0" layoutY="125.0" pickOnBounds="true" preserveRatio="true">
          <image>
             <Image url="@../resources/inbound.png" />
          </image>
@@ -57,7 +57,7 @@
             <Image url="@../resources/secured.png" />
          </image>
       </ImageView>
-      <Line endX="100.0" layoutX="661.0" layoutY="404.0" startX="-100.0" />
+      <Line fx:id="lineInvalidCPassword" endX="100.0" layoutX="661.0" layoutY="404.0" startX="-100.0" />
       <Button fx:id="buttonSignUp" layoutX="553.0" layoutY="438.0" mnemonicParsing="false" prefHeight="34.0" prefWidth="191.0" style="-fx-background-color: #56BFAC;" text="Sign Up">
          <cursor>
             <Cursor fx:constant="HAND" />
@@ -73,8 +73,8 @@
             <Font name="Rockwell" size="12.0" />
          </font>
       </Text>
-      <Line endX="100.0" layoutX="668.0" layoutY="52.0" startX="-100.0" />
-      <Line endX="100.0" layoutX="667.0" layoutY="104.0" startX="-100.0" />
+      <Line fx:id="lineInvalidEmail" endX="100.0" layoutX="668.0" layoutY="52.0" startX="-100.0" />
+      <Line fx:id="lineInvalidName" endX="100.0" layoutX="667.0" layoutY="104.0" startX="-100.0" />
       <Text fx:id="labelInvalidName" fill="RED" layoutX="523.0" layoutY="123.0" strokeType="OUTSIDE" strokeWidth="0.0" text="" visible="true" wrappingWidth="249.9999934732914">
          <font>
             <Font name="Rockwell" size="12.0" />
@@ -111,21 +111,21 @@
             <Font size="18.0" />
          </font>
       </Hyperlink>
-      <ComboBox layoutX="563.0" layoutY="124.0" prefHeight="25.0" prefWidth="58.0" style="-fx-background-color: FFFFFF;" />
+      <ComboBox fx:id="comboPhone" layoutX="555.0" layoutY="124.0" prefHeight="25.0" prefWidth="79.0" style="-fx-background-color: FFFFFF;" />
       <ImageView fitHeight="34.0" fitWidth="41.0" layoutX="524.0" layoutY="188.0" pickOnBounds="true" preserveRatio="true">
          <image>
             <Image url="@../resources/search.png" />
          </image>
       </ImageView>
       <TextField fx:id="textFieldDirection" layoutX="562.0" layoutY="188.0" prefHeight="34.0" prefWidth="216.0" promptText="Direction" style="-fx-background-color: FFFFFF;" />
-      <Line endX="100.0" layoutX="667.0" layoutY="222.0" startX="-100.0" />
+      <Line fx:id="lineInvalidDirection" endX="100.0" layoutX="667.0" layoutY="222.0" startX="-100.0" />
       <ImageView fitHeight="34.0" fitWidth="41.0" layoutX="526.0" layoutY="250.0" pickOnBounds="true" preserveRatio="true">
          <image>
             <Image url="@../resources/location.png" />
          </image>
       </ImageView>
       <TextField fx:id="textFieldCode" layoutX="567.0" layoutY="250.0" prefHeight="34.0" prefWidth="216.0" promptText="Code Postal" style="-fx-background-color: FFFFFF;" />
-      <Line endX="100.0" layoutX="670.0" layoutY="284.0" startX="-100.0" />
+      <Line fx:id="lineInvalidCodePostal" endX="100.0" layoutX="670.0" layoutY="284.0" startX="-100.0" />
       <Text fx:id="labelInvalidCode" fill="RED" layoutX="524.0" layoutY="306.0" strokeType="OUTSIDE" strokeWidth="0.0" text="" visible="true" wrappingWidth="249.9999934732914">
          <font>
             <Font name="Rockwell" size="12.0" />

@@ -8,9 +8,8 @@
   </information>
   <resources>
     <j2se version="1.6+" href="http://java.sun.com/products/autodl/j2se"/>
-    <jar href="RetoSignInSignUpClient.jar" size="1379686" download="eager" />
-    <jar href="lib\libphonenumber-8.12.9-javadoc.jar" size="602352" download="eager" />
-    <jar href="lib\libphonenumber-8.13.23-javadoc.jar" size="384336" download="eager" />
+    <jar href="RetoSignInSignUpClient.jar" size="1385624" download="eager" />
+    <jar href="lib\java-build-1.0-SNAPSHOT-jar-with-dependencies.jar" size="534403" download="eager" />
   </resources>
   <applet-desc  width="800" height="600" main-class="com.javafx.main.NoJavaFXFallback"  name="RetoSignInSignUpClient" >
     <param name="requiredFXVersion" value="8.0+"/>
