@@ -25,12 +25,20 @@ import java.util.regex.Pattern;
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
+import javafx.scene.control.Hyperlink;
+import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TextFormatter;
+import javafx.scene.control.ToggleButton;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.paint.Color;
@@ -48,11 +56,21 @@ public class SignUpController {
     @FXML
     private ComboBox comboPhone;
     @FXML
-    private TextField textFieldPhone, textFieldEmail;
+    private TextField textFieldPhone, textFieldEmail, textFieldPassword;
     @FXML
     private Line lineInvalidPhone, lineInvalidEmail;
     @FXML
     private Text labelInvalidPhone, labelInvalidEmail;
+    @FXML
+    private Hyperlink hyperLinkSignIn;
+    @FXML
+    private PasswordField password;
+    @FXML
+    private ToggleButton buttonShowHide;
+    @FXML
+    private ImageView imageViewButton;
+    @FXML
+    private Button buttonSignUp;
 
     private Map<String, String> prefijosTelefonos;
     private static Map<String, String> acronimos = new HashMap<>();
@@ -75,6 +93,14 @@ public class SignUpController {
 
         stage.setTitle("SignUp");
         stage.setResizable(false);
+        
+        // HyperLnk //
+        //Accion de dirigir a la ventana de SignUp
+        hyperLinkSignIn.setOnAction(event -> SignIn());
+        
+        // ButtonSignIn //
+        //Accion de dirigir a la ventana de Welcome
+        buttonSignUp.setOnAction(event -> Welcome());
 
         prefijosTelefonos = leerCsv();
 
@@ -100,7 +126,7 @@ public class SignUpController {
             }
             return change;
         };
-
+ 
         TextFormatter<String> textFormatter = new TextFormatter<>(filter);
         textFieldEmail.setTextFormatter(textFormatter);
 
@@ -161,7 +187,7 @@ public class SignUpController {
     public static Map<String, String> leerCsv() {
         Map<String, String> datos = new HashMap<>();
 
-        try (BufferedReader reader = new BufferedReader(new FileReader("C:\\Users\\2dam\\Desktop\\Reto1-Sign-Up-In-Application\\src\\resources\\paises.csv"))) {
+        try (BufferedReader reader = new BufferedReader(new FileReader(".\\src\\resources\\paises.csv"))) {
             String linea;
             while ((linea = reader.readLine()) != null) {
                 String[] partes = linea.split(",");
@@ -212,6 +238,61 @@ public class SignUpController {
                 boolean valido = emailEsValido();
 
             }
+        }
+    }
+    
+    private void SignIn() {
+        try {
+            stage.close();
+            LOGGER.info("SignUp window closed");
+            FXMLLoader loader = new FXMLLoader(getClass().getClassLoader().getResource("view/SignIn.fxml"));
+            Parent root = (Parent) loader.load();
+
+            SignInController controller = ((SignInController) loader.getController());
+
+            controller.setStage(new Stage());
+
+            controller.initStage(root);
+            LOGGER.info("SignIn window opened");
+        } catch (IOException ex) {
+
+        }
+    }
+    
+        /**
+     * Check what state (pressed/not pressed) the password is in.
+     *
+     * @param event an ActionEvent.ACTION event type for when the button is
+     * pressed
+     */
+    private void handleShowHide(ActionEvent event) {
+        if (buttonShowHide.isSelected()) {
+            imageViewButton.setImage(new Image(getClass().getResourceAsStream("/resources/iconEye2.png")));
+            password.setVisible(false);
+            textFieldPassword.setVisible(true);
+        } else {
+            // Si no está presionado se muestra un passwordField y la imagen de imageShowHide es showIcon.
+            imageViewButton.setImage(new Image(getClass().getResourceAsStream("/resources/iconEye.png")));
+            password.setVisible(true);
+            textFieldPassword.setVisible(false);
+        }
+    }
+
+    private void Welcome() {
+        try {
+            stage.close();
+            LOGGER.info("SignUp window closed");
+            FXMLLoader loader = new FXMLLoader(getClass().getClassLoader().getResource("view/Welcome.fxml"));
+            Parent root = (Parent) loader.load();
+
+            WelcomeController controller = ((WelcomeController) loader.getController());
+
+            controller.setStage(new Stage());
+
+            controller.initStage(root);
+            LOGGER.info("Welcome window opened");
+        } catch (IOException ex) {
+
         }
     }
 }

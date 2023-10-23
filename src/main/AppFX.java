@@ -16,7 +16,7 @@ import view.SignInController;
  *
  * @author bayro
  */
-public class AppFX extends Application {
+public class AppFX extends javafx.application.Application {
     
     @Override
     public void start(Stage stage) throws IOException {

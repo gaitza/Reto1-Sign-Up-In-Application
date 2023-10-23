@@ -81,6 +81,10 @@ public class SignInController {
         //Accion de dirigir a la ventana de SignUp
         hyperLinkSignUp.setOnAction(event -> SignUp());
         
+        // ButtonSignIn //
+        //Accion de dirigir a la ventana de Welcome
+        buttonSignIn.setOnAction(event -> Welcome());
+        
         // USERNAME TEXT FIELD //
         // Comprobar si el texto cambia
         textFieldUser.setOnKeyTyped(this::textChanged);
@@ -107,6 +111,8 @@ public class SignInController {
 
         stage.show();
         LOGGER.info("SingIn window initialized");
+        
+        
     }
 
     private void SignUp() {
@@ -233,6 +239,24 @@ public class SignInController {
                     labelInvalidPassword.setText(ex.getMessage());
                 }
             }
+
+        }
+    }
+
+    private void Welcome() {
+        try {
+            stage.close();
+            LOGGER.info("SignIn window closed");
+            FXMLLoader loader = new FXMLLoader(getClass().getClassLoader().getResource("view/Welcome.fxml"));
+            Parent root = (Parent) loader.load();
+
+            WelcomeController controller = ((WelcomeController) loader.getController());
+
+            controller.setStage(new Stage());
+
+            controller.initStage(root);
+            LOGGER.info("Welcome window opened");
+        } catch (IOException ex) {
 
         }
     }

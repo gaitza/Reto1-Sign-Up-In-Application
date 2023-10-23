@@ -58,10 +58,13 @@
          </image>
       </ImageView>
       <Line fx:id="lineInvalidCPassword" endX="100.0" layoutX="661.0" layoutY="404.0" startX="-100.0" />
-      <Button fx:id="buttonSignUp" layoutX="553.0" layoutY="438.0" mnemonicParsing="false" prefHeight="34.0" prefWidth="191.0" style="-fx-background-color: #56BFAC;" text="Sign Up">
+      <Button fx:id="buttonSignUp" defaultButton="true" layoutX="666.0" layoutY="438.0" mnemonicParsing="false" prefHeight="34.0" prefWidth="191.0" style="-fx-background-color: #56BFAC;" text="Sign Up">
          <cursor>
             <Cursor fx:constant="HAND" />
          </cursor>
+         <font>
+            <Font name="System Bold" size="12.0" />
+         </font>
       </Button>
       <Text fx:id="labelInvalidPhone" fill="RED" layoutX="525.0" layoutY="173.0" strokeType="OUTSIDE" strokeWidth="0.0" text="" visible="true" wrappingWidth="249.9999934732914">
          <font>
@@ -90,7 +93,7 @@
             <Font name="Rockwell" size="12.0" />
          </font>
       </Text>
-      <ImageView fx:id="IconEye" fitHeight="30.0" fitWidth="30.0" layoutX="743.0" layoutY="313.0" pickOnBounds="true" preserveRatio="true">
+      <ImageView fx:id="imageViewButton" fitHeight="30.0" fitWidth="30.0" layoutX="743.0" layoutY="313.0" pickOnBounds="true" preserveRatio="true">
          <image>
             <Image url="@../resources/iconEye.png" />
          </image>
@@ -100,13 +103,13 @@
             <Font name="Arial" size="18.0" />
          </font>
       </Text>
-      <ImageView fx:id="IconEye1" fitHeight="30.0" fitWidth="30.0" layoutX="744.0" layoutY="372.0" pickOnBounds="true" preserveRatio="true">
+      <ImageView fx:id="imageViewButton" fitHeight="30.0" fitWidth="30.0" layoutX="744.0" layoutY="372.0" pickOnBounds="true" preserveRatio="true">
          <image>
             <Image url="@../resources/iconEye.png" />
          </image>
       </ImageView>
       <TextField fx:id="textFieldConfirmPassword" layoutX="562.0" layoutY="318.0" prefHeight="34.0" prefWidth="216.0" promptText="Password" style="-fx-background-color: FFFFFF;" visible="false" />
-      <Hyperlink fx:id="hyperLinkSignIn" layoutX="144.0" layoutY="455.0" text="Click here">
+      <Hyperlink fx:id="hyperLinkSignIn" layoutX="110.0" layoutY="437.0" text="¿Ya tienes cuenta?">
          <font>
             <Font size="18.0" />
          </font>
@@ -136,5 +139,10 @@
             <Font name="Rockwell" size="12.0" />
          </font>
       </Text>
+      <Button fx:id="buttonSignUp1" cancelButton="true" layoutX="426.0" layoutY="438.0" mnemonicParsing="false" prefHeight="34.0" prefWidth="191.0" text="Salir">
+         <cursor>
+            <Cursor fx:constant="HAND" />
+         </cursor>
+      </Button>
    </children>
 </Pane>
