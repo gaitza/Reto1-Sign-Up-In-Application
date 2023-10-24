@@ -2,6 +2,7 @@
 
 <?import javafx.scene.Cursor?>
 <?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.Hyperlink?>
 <?import javafx.scene.control.PasswordField?>
 <?import javafx.scene.control.TextField?>
@@ -15,8 +16,8 @@
 
 <Pane prefHeight="500.0" prefWidth="900.0" style="-fx-background-color: FFFFFF;" xmlns="http://javafx.com/javafx/9.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="view.SignUpController">
    <children>
-      <TextField fx:id="textFieldPassword" layoutX="575.0" layoutY="259.0" prefHeight="34.0" prefWidth="216.0" promptText="Password" style="-fx-background-color: FFFFFF;" />
-      <PasswordField fx:id="password" layoutX="565.0" layoutY="259.0" prefHeight="34.0" prefWidth="216.0" promptText="Password" style="-fx-background-color: FFFFFF;">
+      <TextField fx:id="textFieldPassword" layoutX="562.0" layoutY="302.0" prefHeight="34.0" prefWidth="216.0" promptText="Password" style="-fx-background-color: FFFFFF;" />
+      <PasswordField fx:id="password" layoutX="558.0" layoutY="302.0" prefHeight="34.0" prefWidth="216.0" promptText="Password" style="-fx-background-color: FFFFFF;">
          <tooltip>
             <Tooltip text="The password must be at least 8 characters long and have no spaces." />
          </tooltip></PasswordField>
@@ -25,91 +26,123 @@
             <Image url="@../resources/Mobile%20login-amico%20(1).png" />
          </image>
       </ImageView>
-      <TextField fx:id="textFieldUser" layoutX="567.0" layoutY="66.0" prefHeight="34.0" prefWidth="216.0" promptText="UserName" style="-fx-background-color: FFFFFF;" />
-      <TextField fx:id="textFieldEmail" layoutX="567.0" layoutY="131.0" prefHeight="34.0" prefWidth="216.0" promptText="Email" style="-fx-background-color: FFFFFF;" />
-      <TextField fx:id="textFieldName" layoutX="567.0" layoutY="201.0" prefHeight="34.0" prefWidth="216.0" promptText="Name" style="-fx-background-color: FFFFFF;" />
-      <Line endX="100.0" layoutX="675.0" layoutY="100.0" startX="-100.0" />
-      <Line endX="100.0" layoutX="668.0" layoutY="320.0" startX="-100.0" />
-      <ImageView fitHeight="34.0" fitWidth="41.0" layoutX="534.0" layoutY="73.0" pickOnBounds="true" preserveRatio="true">
+      <TextField fx:id="textFieldPhone" layoutX="625.0" layoutY="119.0" prefHeight="34.0" prefWidth="148.0" promptText="PhoneNumber" style="-fx-background-color: FFFFFF;" />
+      <TextField fx:id="textFieldEmail" layoutX="560.0" layoutY="18.0" prefHeight="34.0" prefWidth="216.0" promptText="Email" style="-fx-background-color: FFFFFF;" />
+      <TextField fx:id="textFieldName" layoutX="559.0" layoutY="70.0" prefHeight="34.0" prefWidth="216.0" promptText="Name" style="-fx-background-color: FFFFFF;" />
+      <Line fx:id="lineInvalidPhone" endX="100.0" layoutX="665.0" layoutY="153.0" startX="-100.0" />
+      <Line fx:id="lineInvalidPassword" endX="100.0" layoutX="666.0" layoutY="343.0" startX="-100.0" />
+      <ImageView fitHeight="34.0" fitWidth="41.0" layoutX="521.0" layoutY="125.0" pickOnBounds="true" preserveRatio="true">
          <image>
-            <Image url="@../resources/account.png" />
+            <Image url="@../resources/inbound.png" />
          </image>
       </ImageView>
-      <ImageView fitHeight="34.0" fitWidth="41.0" layoutX="533.0" layoutY="131.0" pickOnBounds="true" preserveRatio="true">
+      <ImageView fitHeight="34.0" fitWidth="41.0" layoutX="526.0" layoutY="18.0" pickOnBounds="true" preserveRatio="true">
          <image>
             <Image url="@../resources/at-sign.png" />
          </image>
       </ImageView>
-      <ImageView fitHeight="34.0" fitWidth="41.0" layoutX="534.0" layoutY="201.0" pickOnBounds="true" preserveRatio="true">
+      <ImageView fitHeight="34.0" fitWidth="41.0" layoutX="526.0" layoutY="70.0" pickOnBounds="true" preserveRatio="true">
          <image>
             <Image url="@../resources/id-card%20(1).png" />
          </image>
       </ImageView>
-      <ImageView fitHeight="34.0" fitWidth="41.0" layoutX="532.0" layoutY="268.0" pickOnBounds="true" preserveRatio="true">
+      <ImageView fitHeight="34.0" fitWidth="41.0" layoutX="525.0" layoutY="311.0" pickOnBounds="true" preserveRatio="true">
          <image>
             <Image url="@../resources/secured.png" />
          </image>
       </ImageView>
-      <PasswordField fx:id="confirmPassword" layoutX="563.0" layoutY="318.0" prefHeight="34.0" prefWidth="216.0" promptText="Password" style="-fx-background-color: FFFFFF;" />
-      <ImageView fitHeight="34.0" fitWidth="41.0" layoutX="531.0" layoutY="327.0" pickOnBounds="true" preserveRatio="true">
+      <PasswordField fx:id="confirmPassword" layoutX="556.0" layoutY="361.0" prefHeight="34.0" prefWidth="216.0" promptText="ConfirmPassword" style="-fx-background-color: FFFFFF;" />
+      <ImageView fitHeight="34.0" fitWidth="41.0" layoutX="524.0" layoutY="370.0" pickOnBounds="true" preserveRatio="true">
          <image>
             <Image url="@../resources/secured.png" />
          </image>
       </ImageView>
-      <Line endX="100.0" layoutX="675.0" layoutY="302.0" startX="-100.0" />
-      <Line endX="100.0" layoutX="668.0" layoutY="361.0" startX="-100.0" />
-      <Button fx:id="buttonSignUp" layoutX="574.0" layoutY="411.0" mnemonicParsing="false" prefHeight="34.0" prefWidth="191.0" style="-fx-background-color: #56BFAC;" text="Sign Up">
+      <Line fx:id="lineInvalidCPassword" endX="100.0" layoutX="661.0" layoutY="404.0" startX="-100.0" />
+      <Button fx:id="buttonSignUp" defaultButton="true" layoutX="666.0" layoutY="438.0" mnemonicParsing="false" prefHeight="34.0" prefWidth="191.0" style="-fx-background-color: #56BFAC;" text="Sign Up">
          <cursor>
             <Cursor fx:constant="HAND" />
          </cursor>
+         <font>
+            <Font name="System Bold" size="12.0" />
+         </font>
       </Button>
-      <Text fx:id="labelInvalidUser" fill="RED" layoutX="535.0" layoutY="120.0" strokeType="OUTSIDE" strokeWidth="0.0" text="" visible="true" wrappingWidth="249.9999934732914">
+      <Text fx:id="labelInvalidPhone" fill="RED" layoutX="525.0" layoutY="173.0" strokeType="OUTSIDE" strokeWidth="0.0" text="" visible="true" wrappingWidth="249.9999934732914">
          <font>
             <Font name="Rockwell" size="12.0" />
          </font>
       </Text>
-      <Text fx:id="labelInvalidEmail" fill="RED" layoutX="531.0" layoutY="187.0" strokeType="OUTSIDE" strokeWidth="0.0" text="" visible="true" wrappingWidth="249.9999934732914">
+      <Text fx:id="labelInvalidEmail" fill="RED" layoutX="524.0" layoutY="74.0" strokeType="OUTSIDE" strokeWidth="0.0" text="" visible="true" wrappingWidth="249.9999934732914">
          <font>
             <Font name="Rockwell" size="12.0" />
          </font>
       </Text>
-      <Line endX="100.0" layoutX="675.0" layoutY="165.0" startX="-100.0" />
-      <Line endX="100.0" layoutX="675.0" layoutY="235.0" startX="-100.0" />
-      <Text fx:id="labelInvalidName" fill="RED" layoutX="531.0" layoutY="254.0" strokeType="OUTSIDE" strokeWidth="0.0" text="" visible="true" wrappingWidth="249.9999934732914">
+      <Line fx:id="lineInvalidEmail" endX="100.0" layoutX="668.0" layoutY="52.0" startX="-100.0" />
+      <Line fx:id="lineInvalidName" endX="100.0" layoutX="667.0" layoutY="104.0" startX="-100.0" />
+      <Text fx:id="labelInvalidName" fill="RED" layoutX="523.0" layoutY="123.0" strokeType="OUTSIDE" strokeWidth="0.0" text="" visible="true" wrappingWidth="249.9999934732914">
          <font>
             <Font name="Rockwell" size="12.0" />
          </font>
       </Text>
-      <Text fx:id="labelInvalidPassword" fill="RED" layoutX="531.0" layoutY="322.0" strokeType="OUTSIDE" strokeWidth="0.0" text="" visible="true" wrappingWidth="249.9999934732914">
+      <Text fx:id="labelInvalidPassword" fill="RED" layoutX="524.0" layoutY="365.0" strokeType="OUTSIDE" strokeWidth="0.0" text="" visible="true" wrappingWidth="249.9999934732914">
          <font>
             <Font name="Rockwell" size="12.0" />
          </font>
       </Text>
-      <Text fx:id="labelInvalidPasswordConfirm" fill="RED" layoutX="531.0" layoutY="381.0" strokeType="OUTSIDE" strokeWidth="0.0" text="" visible="true" wrappingWidth="249.9999934732914">
+      <Text fx:id="labelInvalidPasswordConfirm" fill="RED" layoutX="524.0" layoutY="424.0" strokeType="OUTSIDE" strokeWidth="0.0" text="" visible="true" wrappingWidth="249.9999934732914">
          <font>
             <Font name="Rockwell" size="12.0" />
          </font>
       </Text>
-      <ImageView fx:id="IconEye" fitHeight="30.0" fitWidth="30.0" layoutX="750.0" layoutY="270.0" pickOnBounds="true" preserveRatio="true">
+      <ImageView fx:id="imageViewButton" fitHeight="30.0" fitWidth="30.0" layoutX="743.0" layoutY="313.0" pickOnBounds="true" preserveRatio="true">
          <image>
             <Image url="@../resources/iconEye.png" />
          </image>
       </ImageView>
-      <Text layoutX="72.0" layoutY="451.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Do you hace already an account?">
+      <Text layoutX="72.0" layoutY="451.0" strokeType="OUTSIDE" strokeWidth="0.0" text=" ">
          <font>
             <Font name="Arial" size="18.0" />
          </font>
       </Text>
-      <ImageView fx:id="IconEye1" fitHeight="30.0" fitWidth="30.0" layoutX="751.0" layoutY="329.0" pickOnBounds="true" preserveRatio="true">
+      <ImageView fx:id="imageViewButton" fitHeight="30.0" fitWidth="30.0" layoutX="744.0" layoutY="372.0" pickOnBounds="true" preserveRatio="true">
          <image>
             <Image url="@../resources/iconEye.png" />
          </image>
       </ImageView>
       <TextField fx:id="textFieldConfirmPassword" layoutX="562.0" layoutY="318.0" prefHeight="34.0" prefWidth="216.0" promptText="Password" style="-fx-background-color: FFFFFF;" visible="false" />
-      <Hyperlink fx:id="hyperLinkSignIn" layoutX="144.0" layoutY="455.0" text="Click here">
+      <Hyperlink fx:id="hyperLinkSignIn" layoutX="110.0" layoutY="437.0" text="¿Ya tienes cuenta?">
          <font>
             <Font size="18.0" />
          </font>
       </Hyperlink>
+      <ComboBox fx:id="comboPhone" layoutX="555.0" layoutY="124.0" prefHeight="25.0" prefWidth="79.0" style="-fx-background-color: FFFFFF;" />
+      <ImageView fitHeight="34.0" fitWidth="41.0" layoutX="524.0" layoutY="188.0" pickOnBounds="true" preserveRatio="true">
+         <image>
+            <Image url="@../resources/search.png" />
+         </image>
+      </ImageView>
+      <TextField fx:id="textFieldDirection" layoutX="562.0" layoutY="188.0" prefHeight="34.0" prefWidth="216.0" promptText="Direction" style="-fx-background-color: FFFFFF;" />
+      <Line fx:id="lineInvalidDirection" endX="100.0" layoutX="667.0" layoutY="222.0" startX="-100.0" />
+      <ImageView fitHeight="34.0" fitWidth="41.0" layoutX="526.0" layoutY="250.0" pickOnBounds="true" preserveRatio="true">
+         <image>
+            <Image url="@../resources/location.png" />
+         </image>
+      </ImageView>
+      <TextField fx:id="textFieldCode" layoutX="567.0" layoutY="250.0" prefHeight="34.0" prefWidth="216.0" promptText="Code Postal" style="-fx-background-color: FFFFFF;" />
+      <Line fx:id="lineInvalidCodePostal" endX="100.0" layoutX="670.0" layoutY="284.0" startX="-100.0" />
+      <Text fx:id="labelInvalidCode" fill="RED" layoutX="524.0" layoutY="306.0" strokeType="OUTSIDE" strokeWidth="0.0" text="" visible="true" wrappingWidth="249.9999934732914">
+         <font>
+            <Font name="Rockwell" size="12.0" />
+         </font>
+      </Text>
+      <Text fx:id="labelInvalidAddress" fill="RED" layoutX="525.0" layoutY="246.0" strokeType="OUTSIDE" strokeWidth="0.0" text="" visible="true" wrappingWidth="249.9999934732914">
+         <font>
+            <Font name="Rockwell" size="12.0" />
+         </font>
+      </Text>
+      <Button fx:id="buttonSignUp1" cancelButton="true" layoutX="426.0" layoutY="438.0" mnemonicParsing="false" prefHeight="34.0" prefWidth="191.0" text="Salir">
+         <cursor>
+            <Cursor fx:constant="HAND" />
+         </cursor>
+      </Button>
    </children>
 </Pane>

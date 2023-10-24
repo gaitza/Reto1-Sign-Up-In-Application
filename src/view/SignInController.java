@@ -25,7 +25,6 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Line;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
-
 /**
  *
  * @author bayro
@@ -37,9 +36,7 @@ public class SignInController {
     private static final Logger LOGGER = Logger.getLogger("SignInController.class");
 
     @FXML
-    private TextField textFieldUser;
-    @FXML
-    private TextField textFieldPassword;
+    private TextField textFieldUser,  textFieldPassword;
     @FXML
     private PasswordField password;
     @FXML
@@ -66,7 +63,7 @@ public class SignInController {
     public void setStage(Stage stage) {
         this.stage = stage;
     }
-
+    
     /**
      * Method that initialises the window.
      *
@@ -79,17 +76,22 @@ public class SignInController {
 
         stage.setTitle("SignIn");
         stage.setResizable(false);
+          
         // HyperLnk //
         //Accion de dirigir a la ventana de SignUp
         hyperLinkSignUp.setOnAction(event -> SignUp());
-
+        
+        // ButtonSignIn //
+        //Accion de dirigir a la ventana de Welcome
+        buttonSignIn.setOnAction(event -> Welcome());
+        
         // USERNAME TEXT FIELD //
         // Comprobar si el texto cambia
         textFieldUser.setOnKeyTyped(this::textChanged);
         // Comprobacion del cambio de foco en el campo de texto
         textFieldUser.focusedProperty().addListener(this::focusedChange);
         textFieldUser.setOnKeyTyped(this::updateLabel);
-
+        
         // PASSWORD FIELD //
         // Comprobar si el texto cambia
         password.setOnKeyReleased(this::copyPassword);
@@ -109,6 +111,8 @@ public class SignInController {
 
         stage.show();
         LOGGER.info("SingIn window initialized");
+        
+        
     }
 
     private void SignUp() {
@@ -235,6 +239,24 @@ public class SignInController {
                     labelInvalidPassword.setText(ex.getMessage());
                 }
             }
+
+        }
+    }
+
+    private void Welcome() {
+        try {
+            stage.close();
+            LOGGER.info("SignIn window closed");
+            FXMLLoader loader = new FXMLLoader(getClass().getClassLoader().getResource("view/Welcome.fxml"));
+            Parent root = (Parent) loader.load();
+
+            WelcomeController controller = ((WelcomeController) loader.getController());
+
+            controller.setStage(new Stage());
+
+            controller.initStage(root);
+            LOGGER.info("Welcome window opened");
+        } catch (IOException ex) {
 
         }
     }
