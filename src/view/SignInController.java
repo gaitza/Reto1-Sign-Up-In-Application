@@ -5,7 +5,10 @@
  */
 package view;
 
+import exceptions.InvalidEmailValueException;
+import exceptions.InvalidPasswordException;
 import java.io.IOException;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
@@ -22,6 +25,7 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.paint.Color;
+import javafx.scene.paint.Paint;
 import javafx.scene.shape.Line;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
@@ -56,6 +60,8 @@ public class SignInController {
     @FXML
     private ImageView imageViewButton;
 
+    private Color customColorGreen = Color.web("#14FF0D");
+    
     public Stage getStage() {
         return stage;
     }
@@ -152,37 +158,38 @@ public class SignInController {
         }
     }
 
-    private void updateLabel(KeyEvent event) {
+    private boolean updateLabel(KeyEvent event) {
         try {
-
+            
             if (event.getSource() instanceof PasswordField) {
                 PasswordField passw = (PasswordField) event.getSource();
                 if (passw.getText().length() <= 8) {
-                    throw new IOException("Password must be al least 8 characters long");
-
+                    throw new InvalidPasswordException("Password must be al least 8 characters long");
+                    
                 }
-                linePassword.setStroke(Color.GRAY);
+                linePassword.setStroke(customColorGreen);
                 labelInvalidPassword.setText("");
             }
             if (event.getSource() instanceof TextField) {
                 TextField textField = (TextField) event.getSource();
                 if (!textField.getText().isEmpty() && !textField.getText().contains(" ")) {
-                    throw new IOException();
+                    throw new InvalidPasswordException();
                 }
                 if (textField.equals(textFieldPassword) && textField.getText().length() <= 8) {
-                    throw new IOException("Password must be al least 8 characters long");
+                    throw new InvalidPasswordException("Password must be al least 8 characters long");
                 }
-                lineUser.setStroke(Color.GRAY);
+                lineUser.setStroke(customColorGreen);
                 labelInvalidUser.setText("");
             }
 
-        } catch (IOException ex) {
+        } catch (InvalidPasswordException ex) {
             if (ex.getMessage() != null) {
                 linePassword.setStroke(Color.RED);
                 LOGGER.info(ex.getMessage());
                 labelInvalidPassword.setText(ex.getMessage());
             }
         }
+        return true;
     }
 
     private void copyPassword(KeyEvent event) {
@@ -212,7 +219,7 @@ public class SignInController {
                     if (textFieldUser.getText().contains(" ")) {
                         throw new IOException("Username can't contain an empty space");
                     }
-                    lineUser.setStroke(Color.GRAY);
+                    lineUser.setStroke(customColorGreen);
                     labelInvalidUser.setText("");
                 } catch (IOException ex) {
                     lineUser.setStroke(Color.RED);
@@ -231,7 +238,7 @@ public class SignInController {
                     if (password.getText().length() < 8) {
                         throw new IOException("Password must be al least 8 characters long");
                     }
-                    linePassword.setStroke(Color.GRAY);
+                    linePassword.setStroke(customColorGreen);
                     labelInvalidPassword.setText("");
                 } catch (IOException ex) {
                     linePassword.setStroke(Color.RED);
