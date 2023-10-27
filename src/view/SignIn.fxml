@@ -37,13 +37,13 @@
             <Image url="@../resources/account.png" />
          </image>
       </ImageView>
-      <Line fx:id="lineUser" endX="100.0" layoutX="698.0" layoutY="211.0" startX="-100.0" />
+      <Line fx:id="lineUser" endX="100.0" layoutX="698.0" layoutY="211.0" startX="-100.0" strokeWidth="1.6" />
       <PasswordField fx:id="password" layoutX="597.0" layoutY="250.0" prefHeight="34.0" prefWidth="216.0" promptText="Password" style="-fx-background-color: FFFFFF;">
          <tooltip>
             <Tooltip text="The password must be at least 8 characters long and have no spaces." />
          </tooltip>
       </PasswordField>
-      <Line fx:id="linePassword" endX="100.0" layoutX="698.0" layoutY="284.0" startX="-100.0" />
+      <Line fx:id="linePassword" endX="100.0" layoutX="698.0" layoutY="284.0" startX="-100.0" strokeWidth="1.6" />
       <ImageView fitHeight="34.0" fitWidth="41.0" layoutX="565.0" layoutY="250.0" pickOnBounds="true" preserveRatio="true">
          <image>
             <Image url="@../resources/secured.png" />

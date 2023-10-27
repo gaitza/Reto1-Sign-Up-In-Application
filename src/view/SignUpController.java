@@ -9,6 +9,8 @@ import com.google.i18n.phonenumbers.NumberParseException;
 import com.google.i18n.phonenumbers.PhoneNumberUtil;
 import com.google.i18n.phonenumbers.PhoneNumberUtil.PhoneNumberFormat;
 import com.google.i18n.phonenumbers.Phonenumber.PhoneNumber;
+import exceptions.InvalidEmailValueException;
+import exceptions.InvalidPhoneNumberException;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
@@ -93,14 +95,14 @@ public class SignUpController {
 
         stage.setTitle("SignUp");
         stage.setResizable(false);
-        
+
         // HyperLnk //
         //Accion de dirigir a la ventana de SignUp
         hyperLinkSignIn.setOnAction(event -> SignIn());
-        
+
         // ButtonSignIn //
         //Accion de dirigir a la ventana de Welcome
-        buttonSignUp.setOnAction(event -> Welcome());
+        buttonSignUp.setOnAction(this::Welcome);
 
         prefijosTelefonos = leerCsv();
 
@@ -119,19 +121,19 @@ public class SignUpController {
             String newText = change.getControlNewText();
             if (newText.endsWith("@h")) {
                 change.setText("hotmail.com");
-                change.setCaretPosition(change.getCaretPosition()  + "otmail.com".length());
+                change.setCaretPosition(change.getCaretPosition() + "otmail.com".length());
             } else if (newText.endsWith("@g")) {
                 change.setText("gmail.com");
                 change.setCaretPosition(change.getCaretPosition() + "mail.com".length());
             }
             return change;
         };
- 
+
         TextFormatter<String> textFormatter = new TextFormatter<>(filter);
         textFieldEmail.setTextFormatter(textFormatter);
 
-        textFieldPhone.focusedProperty().addListener(this::cambioDeFoco);
-        textFieldEmail.focusedProperty().addListener(this::cambioDeFoco);
+        textFieldPhone.focusedProperty().addListener(this::focusedChangePhone);
+        textFieldEmail.focusedProperty().addListener(this::focusedChangeEmail);
         textFieldEmail.setOnKeyPressed(this::confirmarEmail);
         stage.show();
         LOGGER.info("SingUp window initialized");
@@ -147,30 +149,6 @@ public class SignUpController {
             int caretPosition = textFieldEmail.getCaretPosition();
             textFieldEmail.deleteText(caretPosition - 1, caretPosition);
         }
-    }
-
-    private boolean emailEsValido() {
-        boolean coincide = false;
-        Pattern pattern = Pattern.compile(emailPattern);
-        Matcher matcher = pattern.matcher(textFieldEmail.getText());
-        if (matcher.find()) {
-            coincide = true;
-        }
-        try {
-            if (!coincide) {
-                throw new IOException("Invalid format of email (*@*.*)");
-            }
-            lineInvalidEmail.setStroke(Color.GREY);
-            labelInvalidEmail.setText("");
-            return true;
-
-        } catch (IOException ex) {
-            LOGGER.info(ex.getMessage());
-            lineInvalidEmail.setStroke(Color.RED);
-            labelInvalidEmail.setText(ex.getMessage());
-            return false;
-        }
-
     }
 
     private void mostrarClaveSeleccionada(String newValue, ComboBox comboPhone) {
@@ -205,15 +183,41 @@ public class SignUpController {
         return datos;
     }
 
-    private void cambioDeFoco(ObservableValue observable, Boolean oldValue, Boolean newValue) {
+    private void focusedChangeEmail(ObservableValue observable, Boolean oldValue, Boolean newValue) {
+        if (oldValue) {
+            if (!textFieldEmail.isFocused()) {
+                boolean coincide = false;
+                Pattern pattern = Pattern.compile(emailPattern);
+                Matcher matcher = pattern.matcher(textFieldEmail.getText());
+                if (matcher.find()) {
+                    coincide = true;
+                }
+                try {
+                    if (!coincide) {
+                        throw new InvalidEmailValueException("Invalid format of email (*@*.*)");
+                    }
+                    lineInvalidEmail.setStroke(Color.GREY);
+                    labelInvalidEmail.setText("");
+
+                } catch (InvalidEmailValueException ex) {
+                    LOGGER.info(ex.getMessage());
+                    lineInvalidEmail.setStroke(Color.RED);
+                    labelInvalidEmail.setText(ex.getMessage());
+
+                }
+            }
+        }
+    }
+
+    private void focusedChangePhone(ObservableValue observable, Boolean oldValue, Boolean newValue) {
         if (oldValue) {
             if (!textFieldPhone.isFocused()) {
                 try {
                     if (textFieldPhone.getText().isEmpty()) {
-                        throw new IOException("Enter a Phone");
+                        throw new InvalidPhoneNumberException("Phone number can´t be empty");
                     }
                     if (textFieldPhone.getText().contains(" ")) {
-                        throw new IOException("Phone can´t contains blank spaces");
+                        throw new InvalidPhoneNumberException("Phone can´t contains blank spaces");
                     }
                     PhoneNumberUtil phoneUtil = PhoneNumberUtil.getInstance();
                     PhoneNumber numberProto = phoneUtil.parse(textFieldPhone.getText(), acronimos.get(comboPhone.getValue()));
@@ -222,11 +226,11 @@ public class SignUpController {
                     boolean isValid = phoneUtil.isValidNumber(numberProto);
 
                     if (!isValid) {
-                        throw new IOException("Incorrect ");
+                        throw new InvalidPhoneNumberException("Format of phone number is incorrect ");
                     }
                     lineInvalidPhone.setStroke(Color.GRAY);
                     labelInvalidPhone.setText("");
-                } catch (IOException ex) {
+                } catch (InvalidPhoneNumberException ex) {
                     lineInvalidPhone.setStroke(Color.RED);
                     LOGGER.info(ex.getMessage());
                     labelInvalidPhone.setText(ex.getMessage());
@@ -234,13 +238,9 @@ public class SignUpController {
                     Logger.getLogger(SignUpController.class.getName()).log(Level.SEVERE, null, ex);
                 }
             }
-            if (!textFieldEmail.isFocused()) {
-                boolean valido = emailEsValido();
-
-            }
         }
     }
-    
+
     private void SignIn() {
         try {
             stage.close();
@@ -258,8 +258,8 @@ public class SignUpController {
 
         }
     }
-    
-        /**
+
+    /**
      * Check what state (pressed/not pressed) the password is in.
      *
      * @param event an ActionEvent.ACTION event type for when the button is
@@ -278,7 +278,7 @@ public class SignUpController {
         }
     }
 
-    private void Welcome() {
+    private void Welcome(ActionEvent event) {
         try {
             stage.close();
             LOGGER.info("SignUp window closed");
