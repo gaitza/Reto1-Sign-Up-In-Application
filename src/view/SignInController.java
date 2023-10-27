@@ -10,6 +10,8 @@ import exceptions.InvalidPasswordException;
 import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -29,6 +31,7 @@ import javafx.scene.paint.Paint;
 import javafx.scene.shape.Line;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
+
 /**
  *
  * @author bayro
@@ -40,7 +43,7 @@ public class SignInController {
     private static final Logger LOGGER = Logger.getLogger("SignInController.class");
 
     @FXML
-    private TextField textFieldUser,  textFieldPassword;
+    private TextField textFieldUser, textFieldPassword;
     @FXML
     private PasswordField password;
     @FXML
@@ -62,6 +65,9 @@ public class SignInController {
 
     private Color customColorGreen = Color.web("#14FF0D");
     
+    private boolean userException = false;
+    String emailPattern = "[a-zA-Z0-9._-]+@[a-z]+\\.+[a-z]+";
+
     public Stage getStage() {
         return stage;
     }
@@ -69,7 +75,7 @@ public class SignInController {
     public void setStage(Stage stage) {
         this.stage = stage;
     }
-    
+
     /**
      * Method that initialises the window.
      *
@@ -82,34 +88,35 @@ public class SignInController {
 
         stage.setTitle("SignIn");
         stage.setResizable(false);
-          
+
         // HyperLnk //
-        //Accion de dirigir a la ventana de SignUp
-        hyperLinkSignUp.setOnAction(event -> SignUp());
-        
+        //Action of directing to the SignUp window
+        hyperLinkSignUp.setOnAction(this::SignUp);
+
         // ButtonSignIn //
-        //Accion de dirigir a la ventana de Welcome
-        buttonSignIn.setOnAction(event -> Welcome());
-        
+        //Action of directing to the Welcome window
+        buttonSignIn.setOnAction(this::Welcome);
+
         // USERNAME TEXT FIELD //
-        // Comprobar si el texto cambia
+        // Check if the text changes
         textFieldUser.setOnKeyTyped(this::textChanged);
-        // Comprobacion del cambio de foco en el campo de texto
+        //Checking focus change in text field
         textFieldUser.focusedProperty().addListener(this::focusedChange);
-        textFieldUser.setOnKeyTyped(this::updateLabel);
-        
+        textFieldUser.setOnKeyTyped(this::updateLabelPassword);
+        textFieldUser.setOnKeyTyped(this::updateLabelUser);
+
         // PASSWORD FIELD //
-        // Comprobar si el texto cambia
+        // Checking focus change in text field
         password.setOnKeyReleased(this::copyPassword);
         password.setOnKeyTyped(this::textChanged);
-        // Comprobacion del cambio de foco en el campo de contraseña
+        //Checking the change of focus in the password field
         password.focusedProperty().addListener(this::focusedChange);
-        password.setOnKeyTyped(this::updateLabel);
+        password.setOnKeyTyped(this::updateLabelPassword);
 
         // PASSWORD TEXT FIELD //
-        // Comprobacion del cambio de foco en el campo de texto
+        // Checking the change of focus in the text field
         textFieldPassword.focusedProperty().addListener(this::focusedChange);
-        // Comprobar si el texto cambia
+        // Check if the text changes
         textFieldPassword.setOnKeyTyped(this::textChanged);
         textFieldPassword.setOnKeyReleased(this::copyPassword);
 
@@ -117,11 +124,10 @@ public class SignInController {
 
         stage.show();
         LOGGER.info("SingIn window initialized");
-        
-        
+
     }
 
-    private void SignUp() {
+    private void SignUp(ActionEvent event) {
         try {
             stage.close();
             LOGGER.info("SignIn window closed");
@@ -158,14 +164,13 @@ public class SignInController {
         }
     }
 
-    private boolean updateLabel(KeyEvent event) {
+    private void updateLabelPassword(KeyEvent event) {
         try {
-            
             if (event.getSource() instanceof PasswordField) {
                 PasswordField passw = (PasswordField) event.getSource();
                 if (passw.getText().length() <= 8) {
                     throw new InvalidPasswordException("Password must be al least 8 characters long");
-                    
+
                 }
                 linePassword.setStroke(customColorGreen);
                 labelInvalidPassword.setText("");
@@ -189,15 +194,43 @@ public class SignInController {
                 labelInvalidPassword.setText(ex.getMessage());
             }
         }
-        return true;
+    }
+
+    private void updateLabelUser(KeyEvent event) {
+        try {
+            TextField passw = (TextField) event.getSource();
+            boolean match = false;
+            String user = passw.getText();
+            System.out.println(user);
+            if (user.contains(" ")) {
+                throw new InvalidEmailValueException("Username can't contain an empty space");
+            }
+            Pattern pattern = Pattern.compile(emailPattern);
+            Matcher matcher = pattern.matcher(user);
+            if (matcher.find()) {
+                match = true;
+            }
+            if (!match) {
+                throw new InvalidEmailValueException("Invalid format of email (*@*.*)");
+            }
+            userException = false;
+            lineUser.setStroke(Color.GREY);
+            labelInvalidUser.setText("");
+        } catch (InvalidEmailValueException ex) {
+            lineUser.setStroke(Color.RED);
+            LOGGER.info(ex.getMessage());
+            labelInvalidUser.setText(ex.getMessage());
+            userException = true;
+        }
+
     }
 
     private void copyPassword(KeyEvent event) {
         if (password.isVisible()) {
-            // Cuando se escribe un carácter en el passwordField se copia en el textFieldPassword.
+            // When you type a character in the passwordField it is copied to the textFieldPassword.
             textFieldPassword.setText(password.getText());
         } else if (textFieldPassword.isVisible()) {
-            // Cuando se escribe un carácter en el textFieldPassword se copia en el passwordField.
+            // When you type a character in the textFieldPassword it is copied to the passwordField.
             password.setText(textFieldPassword.getText());
         }
     }
@@ -210,14 +243,12 @@ public class SignInController {
     }
 
     private void focusedChange(ObservableValue observable, Boolean oldValue, Boolean newValue) {
+
         if (oldValue) {
-            if (!textFieldUser.isFocused()) {
+            if (!textFieldUser.isFocused() && !userException) {
                 try {
                     if (textFieldUser.getText().isEmpty()) {
                         throw new IOException("Enter a username");
-                    }
-                    if (textFieldUser.getText().contains(" ")) {
-                        throw new IOException("Username can't contain an empty space");
                     }
                     lineUser.setStroke(customColorGreen);
                     labelInvalidUser.setText("");
@@ -227,16 +258,10 @@ public class SignInController {
                     labelInvalidUser.setText(ex.getMessage());
                 }
             }
-            if (!password.isFocused() && !textFieldPassword.isFocused()) {
+            if (!password.isFocused() && !textFieldPassword.isFocused() && !linePassword.getStroke().equals(Color.RED)) {
                 try {
                     if (password.getText().isEmpty()) {
                         throw new IOException("Enter a password");
-                    }
-                    if (password.getText().contains(" ")) {
-                        throw new IOException("Password can't contain an empty space");
-                    }
-                    if (password.getText().length() < 8) {
-                        throw new IOException("Password must be al least 8 characters long");
                     }
                     linePassword.setStroke(customColorGreen);
                     labelInvalidPassword.setText("");
@@ -250,7 +275,7 @@ public class SignInController {
         }
     }
 
-    private void Welcome() {
+    private void Welcome(ActionEvent event) {
         try {
             stage.close();
             LOGGER.info("SignIn window closed");
