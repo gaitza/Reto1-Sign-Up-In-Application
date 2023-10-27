@@ -186,14 +186,14 @@ public class SignUpController {
     private void focusedChangeEmail(ObservableValue observable, Boolean oldValue, Boolean newValue) {
         if (oldValue) {
             if (!textFieldEmail.isFocused()) {
-                boolean coincide = false;
+                boolean match = false;
                 Pattern pattern = Pattern.compile(emailPattern);
                 Matcher matcher = pattern.matcher(textFieldEmail.getText());
                 if (matcher.find()) {
-                    coincide = true;
+                    match = true;
                 }
                 try {
-                    if (!coincide) {
+                    if (!match) {
                         throw new InvalidEmailValueException("Invalid format of email (*@*.*)");
                     }
                     lineInvalidEmail.setStroke(Color.GREY);
