@@ -8,8 +8,13 @@
   </information>
   <resources>
     <j2se version="1.6+" href="http://java.sun.com/products/autodl/j2se"/>
+<<<<<<< Updated upstream
     <jar href="RetoSignInSignUpClient.jar" size="1806437" download="eager" />
     <jar href="lib\RetoSignInSignUpLibrary.jar" size="10031" download="eager" />
+=======
+    <jar href="RetoSignInSignUpClient.jar" size="1805951" download="eager" />
+    <jar href="lib\RetoSignInSignUpLibrary.jar" size="10017" download="eager" />
+>>>>>>> Stashed changes
     <jar href="lib\java-build-1.0-SNAPSHOT-jar-with-dependencies.jar" size="534403" download="eager" />
   </resources>
   <applet-desc  width="800" height="600" main-class="com.javafx.main.NoJavaFXFallback"  name="RetoSignInSignUpClient" >
