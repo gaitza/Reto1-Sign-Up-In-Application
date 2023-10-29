@@ -6,9 +6,7 @@
 package view;
 
 import com.google.i18n.phonenumbers.NumberParseException;
-import com.google.i18n.phonenumbers.PhoneNumberUtil;
-import com.google.i18n.phonenumbers.PhoneNumberUtil.PhoneNumberFormat;
-import com.google.i18n.phonenumbers.Phonenumber.PhoneNumber;
+import exceptions.CommonException;
 import exceptions.InvalidEmailValueException;
 import exceptions.InvalidPhoneNumberException;
 import java.io.BufferedReader;
@@ -58,11 +56,11 @@ public class SignUpController {
     @FXML
     private ComboBox comboPhone;
     @FXML
-    private TextField textFieldPhone, textFieldEmail, textFieldPassword;
+    private TextField textFieldPhone, textFieldEmail, textFieldPassword, textFieldCode, textFieldDirection, textFieldName,confirmPassword;
     @FXML
-    private Line lineInvalidPhone, lineInvalidEmail;
+    private Line lineInvalidPhone, lineInvalidEmail, lineInvalidDirection, lineInvalidCodePostal, lineInvalidName;
     @FXML
-    private Text labelInvalidPhone, labelInvalidEmail;
+    private Text labelInvalidPhone, labelInvalidEmail, labelInvalidCode, labelInvalidAddress, labelInvalidPasswordConfirm, labelInvalidPassword, labelInvalidName;
     @FXML
     private Hyperlink hyperLinkSignIn;
     @FXML
@@ -76,8 +74,8 @@ public class SignUpController {
 
     private Map<String, String> prefijosTelefonos;
     private static Map<String, String> acronimos = new HashMap<>();
-    String emailPattern = "[a-zA-Z0-9._-]+@[a-z]+\\.+[a-z]+";
 
+    private ValidationHelper helper = new ValidationHelper();
     private static final Logger LOGGER = Logger.getLogger("SignUpController.class");
 
     public Stage getStage() {
@@ -98,7 +96,7 @@ public class SignUpController {
 
         // HyperLnk //
         //Accion de dirigir a la ventana de SignUp
-        hyperLinkSignIn.setOnAction(event -> SignIn());
+        hyperLinkSignIn.setOnAction(this::SignIn);
 
         // ButtonSignIn //
         //Accion de dirigir a la ventana de Welcome
@@ -131,14 +129,75 @@ public class SignUpController {
 
         TextFormatter<String> textFormatter = new TextFormatter<>(filter);
         textFieldEmail.setTextFormatter(textFormatter);
-
-        textFieldPhone.focusedProperty().addListener(this::focusedChangePhone);
         textFieldEmail.focusedProperty().addListener(this::focusedChangeEmail);
         textFieldEmail.setOnKeyPressed(this::confirmarEmail);
+
+        textFieldPhone.focusedProperty().addListener(this::focusedChangePhone);
+        
+        textFieldCode.focusedProperty().addListener(this::focusChangeCode);
+        
+        textFieldName.focusedProperty().addListener(this::focusChangeName);
+        
+        textFieldDirection.focusedProperty().addListener(this::focusChangeDirection);
         stage.show();
+        
         LOGGER.info("SingUp window initialized");
     }
+    private void focusChangeDirection(ObservableValue observable, Boolean oldValue, Boolean newValue) {
+          if (oldValue) {
+            if (!textFieldDirection.isFocused()) {
+                try {
+                    String direction = textFieldDirection.getText();
+                    helper.commomValidations(direction, true, false);
+                 
+                    lineInvalidDirection.setStroke(Color.GREY);
+                    labelInvalidAddress.setText("");
+                } catch (CommonException ex) {
+                    LOGGER.info(ex.getMessage());
+                    lineInvalidDirection.setStroke(Color.RED);
+                    labelInvalidAddress.setText(ex.getMessage());
+                }
+            }
+        }
+    }
+     private void focusChangeName(ObservableValue observable, Boolean oldValue, Boolean newValue) {
+          if (oldValue) {
+            if (!textFieldName.isFocused()) {
+                try {
+                    String name = textFieldName.getText();
+                    helper.commomValidations(name, false, true);
+                    helper.nameValidation(name);
+                    lineInvalidName.setStroke(Color.GREY);
+                    labelInvalidName.setText("");
+                } catch (CommonException ex) {
+                    LOGGER.info(ex.getMessage());
+                    lineInvalidName.setStroke(Color.RED);
+                    labelInvalidName.setText(ex.getMessage());
+                }
+            }
+        }
+    }
+    
+    private void focusChangeCode(ObservableValue observable, Boolean oldValue, Boolean newValue) {
+          if (oldValue) {
+            if (!textFieldCode.isFocused()) {
+                try {
+                    String code = textFieldCode.getText();
+                    helper.commomValidations(code, false, false);
+                    helper.codeValidation(code);
 
+                    lineInvalidCodePostal.setStroke(Color.GREY);
+                    labelInvalidCode.setText("");
+                } catch (CommonException ex) {
+                    LOGGER.info(ex.getMessage());
+                    lineInvalidCodePostal.setStroke(Color.RED);
+                    labelInvalidCode.setText(ex.getMessage());
+
+                }
+            }
+        }
+    }
+    
     private void confirmarEmail(KeyEvent event) {
         if (event.getCode() == KeyCode.ENTER) {
             textFieldEmail.selectRange(0, 0); // Desseleccionar
@@ -169,9 +228,9 @@ public class SignUpController {
             String linea;
             while ((linea = reader.readLine()) != null) {
                 String[] partes = linea.split(",");
-                String clave = partes[1].replaceAll("^\"|\"$", ""); // Elimina comillas
-                String valor = partes[5].replaceAll("^\"|\"$", ""); // Elimina comillas
-                String acronimo = partes[3].replaceAll("^\"|\"$", ""); // Elimina comillas
+                String clave = partes[1].replaceAll("^\"|\"$", ""); // Remove quotes
+                String valor = partes[5].replaceAll("^\"|\"$", ""); // Remove quotes
+                String acronimo = partes[3].replaceAll("^\"|\"$", ""); //Remove quotes
                 if (!clave.equals(" name")) {
                     datos.put(clave, valor);
                     acronimos.put(valor, acronimo);
@@ -186,20 +245,14 @@ public class SignUpController {
     private void focusedChangeEmail(ObservableValue observable, Boolean oldValue, Boolean newValue) {
         if (oldValue) {
             if (!textFieldEmail.isFocused()) {
-                boolean match = false;
-                Pattern pattern = Pattern.compile(emailPattern);
-                Matcher matcher = pattern.matcher(textFieldEmail.getText());
-                if (matcher.find()) {
-                    match = true;
-                }
                 try {
-                    if (!match) {
-                        throw new InvalidEmailValueException("Invalid format of email (*@*.*)");
-                    }
+                    String email = textFieldEmail.getText();
+                    helper.commomValidations(email, true, false);
+                    helper.emailValidation(email);
+
                     lineInvalidEmail.setStroke(Color.GREY);
                     labelInvalidEmail.setText("");
-
-                } catch (InvalidEmailValueException ex) {
+                } catch (InvalidEmailValueException | CommonException ex) {
                     LOGGER.info(ex.getMessage());
                     lineInvalidEmail.setStroke(Color.RED);
                     labelInvalidEmail.setText(ex.getMessage());
@@ -213,24 +266,16 @@ public class SignUpController {
         if (oldValue) {
             if (!textFieldPhone.isFocused()) {
                 try {
-                    if (textFieldPhone.getText().isEmpty()) {
-                        throw new InvalidPhoneNumberException("Phone number can´t be empty");
-                    }
-                    if (textFieldPhone.getText().contains(" ")) {
-                        throw new InvalidPhoneNumberException("Phone can´t contains blank spaces");
-                    }
-                    PhoneNumberUtil phoneUtil = PhoneNumberUtil.getInstance();
-                    PhoneNumber numberProto = phoneUtil.parse(textFieldPhone.getText(), acronimos.get(comboPhone.getValue()));
+                    String tlf = textFieldPhone.getText();
+                    String acro = acronimos.get(comboPhone.getValue());
 
-                    // Verificar si el número es válido
-                    boolean isValid = phoneUtil.isValidNumber(numberProto);
+                    helper.commomValidations(tlf, false, false);
+                    helper.phoneNumberValidation(tlf, acro);
 
-                    if (!isValid) {
-                        throw new InvalidPhoneNumberException("Format of phone number is incorrect ");
-                    }
                     lineInvalidPhone.setStroke(Color.GRAY);
                     labelInvalidPhone.setText("");
-                } catch (InvalidPhoneNumberException ex) {
+
+                } catch (InvalidPhoneNumberException | CommonException ex) {
                     lineInvalidPhone.setStroke(Color.RED);
                     LOGGER.info(ex.getMessage());
                     labelInvalidPhone.setText(ex.getMessage());
@@ -241,7 +286,7 @@ public class SignUpController {
         }
     }
 
-    private void SignIn() {
+    private void SignIn(ActionEvent event) {
         try {
             stage.close();
             LOGGER.info("SignUp window closed");
