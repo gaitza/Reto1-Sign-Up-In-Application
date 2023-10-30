@@ -8,6 +8,7 @@ package view;
 import com.google.i18n.phonenumbers.NumberParseException;
 import exceptions.CommonException;
 import exceptions.InvalidEmailValueException;
+import exceptions.InvalidPasswordException;
 import exceptions.InvalidPhoneNumberException;
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -20,16 +21,17 @@ import java.util.Map;
 import java.util.function.UnaryOperator;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import javafx.application.Platform;
+import javafx.beans.property.ReadOnlyBooleanProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Hyperlink;
@@ -56,7 +58,7 @@ public class SignUpController {
     @FXML
     private ComboBox comboPhone;
     @FXML
-    private TextField textFieldPhone, textFieldEmail, textFieldPassword, textFieldCode, textFieldDirection, textFieldName,confirmPassword;
+    private TextField textFieldPhone, textFieldEmail, textFieldPassword, textFieldCode, textFieldDirection, textFieldName, confirmPassword;
     @FXML
     private Line lineInvalidPhone, lineInvalidEmail, lineInvalidDirection, lineInvalidCodePostal, lineInvalidName;
     @FXML
@@ -74,7 +76,19 @@ public class SignUpController {
 
     private Map<String, String> prefijosTelefonos;
     private static Map<String, String> acronimos = new HashMap<>();
-
+    Map<String, Integer> validate = new HashMap<String, Integer>() {
+        {
+            put("textFieldPhone", 0);
+            put("textFieldEmail", 0);
+           
+            put("textFieldCode", 0);
+            put("textFieldDirection", 0);
+            put("textFieldName", 0);
+           
+        }
+    };
+    private String opc;
+    long quantityValuesZero = validate.values().stream().filter(valor -> valor == 0).count();
     private ValidationHelper helper = new ValidationHelper();
     private static final Logger LOGGER = Logger.getLogger("SignUpController.class");
 
@@ -93,7 +107,7 @@ public class SignUpController {
 
         stage.setTitle("SignUp");
         stage.setResizable(false);
-
+ System.out.println(quantityValuesZero);
         // HyperLnk //
         //Accion de dirigir a la ventana de SignUp
         hyperLinkSignIn.setOnAction(this::SignIn);
@@ -129,75 +143,94 @@ public class SignUpController {
 
         TextFormatter<String> textFormatter = new TextFormatter<>(filter);
         textFieldEmail.setTextFormatter(textFormatter);
-        textFieldEmail.focusedProperty().addListener(this::focusedChangeEmail);
+        textFieldEmail.focusedProperty().addListener(this::focusChange);
         textFieldEmail.setOnKeyPressed(this::confirmarEmail);
 
-        textFieldPhone.focusedProperty().addListener(this::focusedChangePhone);
+        textFieldPhone.focusedProperty().addListener(this::focusChange);
+
+        textFieldCode.focusedProperty().addListener(this::focusChange);
+
+        textFieldName.focusedProperty().addListener(this::focusChange);
+
+        textFieldDirection.focusedProperty().addListener(this::focusChange);
         
-        textFieldCode.focusedProperty().addListener(this::focusChangeCode);
-        
-        textFieldName.focusedProperty().addListener(this::focusChangeName);
-        
-        textFieldDirection.focusedProperty().addListener(this::focusChangeDirection);
+        textFieldCode.setOnKeyTyped(this::updateLabel);
+        textFieldPhone.setOnKeyTyped(this::updateLabel);
+        textFieldName.setOnKeyTyped(this::updateLabel);
+        textFieldDirection.setOnKeyTyped(this::updateLabel);
+        textFieldEmail.setOnKeyTyped(this::updateLabel);
+       
         stage.show();
-        
+
         LOGGER.info("SingUp window initialized");
     }
-    private void focusChangeDirection(ObservableValue observable, Boolean oldValue, Boolean newValue) {
-          if (oldValue) {
-            if (!textFieldDirection.isFocused()) {
-                try {
-                    String direction = textFieldDirection.getText();
-                    helper.commomValidations(direction, true, false);
-                 
-                    lineInvalidDirection.setStroke(Color.GREY);
-                    labelInvalidAddress.setText("");
-                } catch (CommonException ex) {
-                    LOGGER.info(ex.getMessage());
-                    lineInvalidDirection.setStroke(Color.RED);
-                    labelInvalidAddress.setText(ex.getMessage());
-                }
-            }
-        }
-    }
-     private void focusChangeName(ObservableValue observable, Boolean oldValue, Boolean newValue) {
-          if (oldValue) {
-            if (!textFieldName.isFocused()) {
-                try {
-                    String name = textFieldName.getText();
-                    helper.commomValidations(name, false, true);
-                    helper.nameValidation(name);
-                    lineInvalidName.setStroke(Color.GREY);
-                    labelInvalidName.setText("");
-                } catch (CommonException ex) {
-                    LOGGER.info(ex.getMessage());
-                    lineInvalidName.setStroke(Color.RED);
-                    labelInvalidName.setText(ex.getMessage());
-                }
-            }
-        }
-    }
-    
-    private void focusChangeCode(ObservableValue observable, Boolean oldValue, Boolean newValue) {
-          if (oldValue) {
-            if (!textFieldCode.isFocused()) {
-                try {
-                    String code = textFieldCode.getText();
-                    helper.commomValidations(code, false, false);
-                    helper.codeValidation(code);
 
-                    lineInvalidCodePostal.setStroke(Color.GREY);
-                    labelInvalidCode.setText("");
-                } catch (CommonException ex) {
-                    LOGGER.info(ex.getMessage());
-                    lineInvalidCodePostal.setStroke(Color.RED);
-                    labelInvalidCode.setText(ex.getMessage());
-
-                }
+    private void updateLabel(KeyEvent event) {
+        if (quantityValuesZero == 1) {
+            String field = "";
+            String value = " ";
+            if (event.getSource() instanceof PasswordField) {
+                PasswordField passw = (PasswordField) event.getSource();
+                field = passw.getId();
+                value = passw.getText();
             }
+            if (event.getSource() instanceof TextField) {
+                TextField textField = (TextField) event.getSource();
+                field = textField.getId();
+                value = textField.getText();
+            }
+            callValidation(field, value);
         }
     }
-    
+
+    private void focusChange(ObservableValue observable, Boolean oldValue, Boolean newValue) {
+        if (oldValue) {
+            String field = " ";
+            String value = " ";
+            try {
+                ReadOnlyBooleanProperty focusedProperty = (ReadOnlyBooleanProperty) observable;
+                Node node = (Node) focusedProperty.getBean();
+                if (node instanceof TextField) {
+                    TextField textField = (TextField) node;
+                    field = textField.getId();
+                    value = textField.getText();
+                }
+
+            } catch (Exception e) {
+                field = opc;
+            }
+            callValidation(field,value);
+        }
+    }
+
+    private void callValidation(String field, String value) {
+        
+         String acro = acronimos.get(comboPhone.getValue());
+        if (field.equalsIgnoreCase("textFieldCode")) {
+            String val = textFieldCode.getText();
+            helper.executeValidations(field, value, lineInvalidCodePostal, labelInvalidCode, value, validate);
+            System.out.println(validate.get("textFieldCode"));
+        } else if (field.equalsIgnoreCase("textFieldName")) {
+            String val = textFieldName.getText();
+            helper.executeValidations(field, value, lineInvalidName, labelInvalidName, value, validate);
+        } else if (field.equalsIgnoreCase("textFieldDirection")) {
+            String val = textFieldDirection.getText();
+            helper.executeValidations(field, value, lineInvalidDirection, labelInvalidAddress, value, validate);
+        } else if (field.equalsIgnoreCase("textFieldPhone")) {
+            String val = textFieldPhone.getText();
+            helper.executeValidations(field, value, lineInvalidPhone, labelInvalidPhone, acro, validate);
+        } else if (field.equalsIgnoreCase("textFieldEmail")) {
+            String val = textFieldEmail.getText();
+            helper.executeValidations(field, value, lineInvalidEmail, labelInvalidEmail, value, validate);
+        } else if (field.equalsIgnoreCase("textFieldPassword")) {
+            String val = textFieldPassword.getText();
+            helper.executeValidations(field, value, lineInvalidCodePostal, labelInvalidCode, value, validate);
+        } else if (field.equalsIgnoreCase("confirmPassword")) {
+            String val = confirmPassword.getText();
+            helper.executeValidations(field, value, lineInvalidCodePostal, labelInvalidCode, value, validate);
+        }
+    }
+
     private void confirmarEmail(KeyEvent event) {
         if (event.getCode() == KeyCode.ENTER) {
             textFieldEmail.selectRange(0, 0); // Desseleccionar
@@ -242,52 +275,9 @@ public class SignUpController {
         return datos;
     }
 
-    private void focusedChangeEmail(ObservableValue observable, Boolean oldValue, Boolean newValue) {
-        if (oldValue) {
-            if (!textFieldEmail.isFocused()) {
-                try {
-                    String email = textFieldEmail.getText();
-                    helper.commomValidations(email, true, false);
-                    helper.emailValidation(email);
-
-                    lineInvalidEmail.setStroke(Color.GREY);
-                    labelInvalidEmail.setText("");
-                } catch (InvalidEmailValueException | CommonException ex) {
-                    LOGGER.info(ex.getMessage());
-                    lineInvalidEmail.setStroke(Color.RED);
-                    labelInvalidEmail.setText(ex.getMessage());
-
-                }
-            }
-        }
-    }
-
-    private void focusedChangePhone(ObservableValue observable, Boolean oldValue, Boolean newValue) {
-        if (oldValue) {
-            if (!textFieldPhone.isFocused()) {
-                try {
-                    String tlf = textFieldPhone.getText();
-                    String acro = acronimos.get(comboPhone.getValue());
-
-                    helper.commomValidations(tlf, false, false);
-                    helper.phoneNumberValidation(tlf, acro);
-
-                    lineInvalidPhone.setStroke(Color.GRAY);
-                    labelInvalidPhone.setText("");
-
-                } catch (InvalidPhoneNumberException | CommonException ex) {
-                    lineInvalidPhone.setStroke(Color.RED);
-                    LOGGER.info(ex.getMessage());
-                    labelInvalidPhone.setText(ex.getMessage());
-                } catch (NumberParseException ex) {
-                    Logger.getLogger(SignUpController.class.getName()).log(Level.SEVERE, null, ex);
-                }
-            }
-        }
-    }
-
     private void SignIn(ActionEvent event) {
         try {
+
             stage.close();
             LOGGER.info("SignUp window closed");
             FXMLLoader loader = new FXMLLoader(getClass().getClassLoader().getResource("view/SignIn.fxml"));
@@ -325,6 +315,21 @@ public class SignUpController {
 
     private void Welcome(ActionEvent event) {
         try {
+            ObservableValue observable = null;
+            for (Map.Entry<String, Integer> entry : validate.entrySet()) {
+                if (entry.getValue() == 0) {
+                    opc = entry.getKey();
+                    focusChange(observable, Boolean.TRUE, Boolean.FALSE);
+                }
+            }
+
+            if (quantityValuesZero != 0) {
+                String msg = "Error some data is wrong";
+                Alert alert = new Alert(Alert.AlertType.ERROR, msg);
+                alert.show();
+                LOGGER.log(Level.SEVERE, msg);
+                return;
+            }
             stage.close();
             LOGGER.info("SignUp window closed");
             FXMLLoader loader = new FXMLLoader(getClass().getClassLoader().getResource("view/Welcome.fxml"));
@@ -335,6 +340,7 @@ public class SignUpController {
             controller.setStage(new Stage());
 
             controller.initStage(root);
+
             LOGGER.info("Welcome window opened");
         } catch (IOException ex) {
 

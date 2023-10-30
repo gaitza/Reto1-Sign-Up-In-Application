@@ -11,14 +11,22 @@ import com.google.i18n.phonenumbers.Phonenumber;
 import exceptions.CommonException;
 import exceptions.InvalidEmailValueException;
 import exceptions.InvalidPhoneNumberException;
+import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import javafx.scene.paint.Color;
+import javafx.scene.shape.Line;
+import javafx.scene.text.Text;
 
 /**
  *
  * @author bayro
  */
 public class ValidationHelper {
+
+    private static final Logger LOGGER = Logger.getLogger("SignUpController.class");
 
     public void commomValidations(String strng, boolean email, boolean spaces) throws CommonException {
         if (strng.isEmpty()) {
@@ -57,6 +65,8 @@ public class ValidationHelper {
             throw new InvalidPhoneNumberException("You must select a country");
         }
         PhoneNumberUtil phoneUtil = PhoneNumberUtil.getInstance();
+        System.out.println(acro);
+        System.out.println(number);
         Phonenumber.PhoneNumber numberProto = phoneUtil.parse(number, acro);
         // Check if the number is valid
         boolean isValid = phoneUtil.isValidNumber(numberProto);
@@ -91,7 +101,8 @@ public class ValidationHelper {
             throw new CommonException("letters");
         }
     }
-     public void nameValidation(String code) throws CommonException {
+
+    public void nameValidation(String code) throws CommonException {
         Pattern pattern = Pattern.compile("^[^0-9]+$");
         Matcher matcher = pattern.matcher(code);
 
@@ -101,6 +112,90 @@ public class ValidationHelper {
         }
         if (!match) {
             throw new CommonException("numbers");
+        }
+    }
+
+    public void executeValidations(String opc, String value, Line line, Text label, String acro,  Map<String, Integer> validate) {
+
+        switch (opc) {
+            case "textFieldName":
+                try {
+                    commomValidations(value, false, true);
+                    nameValidation(value);
+                    line.setStroke(Color.GREY);
+                    label.setText("");
+                    validate.put("textFieldName", 1);
+                } catch (CommonException ex) {
+                    LOGGER.info(ex.getMessage());
+                    line.setStroke(Color.RED);
+                    label.setText(ex.getMessage());
+                }
+                break;
+            case "textFieldDirection":
+                try {
+                    commomValidations(value, true, false);
+
+                    line.setStroke(Color.GREY);
+                    label.setText("");
+                    validate.put("textFieldDirection", 1);
+                } catch (CommonException ex) {
+                    LOGGER.info(ex.getMessage());
+                    line.setStroke(Color.RED);
+                    label.setText(ex.getMessage());
+                }
+                break;
+            case "textFieldPhone":
+                try {
+                    commomValidations(value, false, false);
+                    phoneNumberValidation(value, acro);
+
+                    line.setStroke(Color.GRAY);
+                    label.setText("");
+                    validate.put("textFieldPhone", 1);
+                } catch (InvalidPhoneNumberException | CommonException ex) {
+                    line.setStroke(Color.RED);
+                    LOGGER.info(ex.getMessage());
+                    label.setText(ex.getMessage());
+                } catch (NumberParseException ex) {
+                    Logger.getLogger(SignUpController.class.getName()).log(Level.SEVERE, null, ex);
+                }
+                break;
+            case "textFieldEmail":
+                try {
+                    commomValidations(value, true, false);
+                    emailValidation(value);
+
+                    line.setStroke(Color.GREY);
+                    label.setText("");
+                    validate.put("textFieldEmail", 1);
+                } catch (InvalidEmailValueException | CommonException ex) {
+                    LOGGER.info(ex.getMessage());
+                    line.setStroke(Color.RED);
+                    label.setText(ex.getMessage());
+
+                }
+                break;
+            case "textFieldPassword":
+                break;
+            case "textFieldCode":
+                try {
+                    commomValidations(value, false, false);
+                    codeValidation(value);
+
+                    line.setStroke(Color.GREY);
+                    label.setText("");
+                    validate.put("textFieldCode", 1);
+                } catch (CommonException ex) {
+                    LOGGER.info(ex.getMessage());
+                    line.setStroke(Color.RED);
+                    label.setText(ex.getMessage());
+
+                }
+                break;
+            case "confirmPassword":
+                break;
+            default:
+                break;
         }
     }
 }

@@ -8,7 +8,7 @@
   </information>
   <resources>
     <j2se version="1.6+" href="http://java.sun.com/products/autodl/j2se"/>
-    <jar href="RetoSignInSignUpClient.jar" size="1810710" download="eager" />
+    <jar href="RetoSignInSignUpClient.jar" size="1810968" download="eager" />
     <jar href="lib\RetoSignInSignUpLibrary.jar" size="11297" download="eager" />
     <jar href="lib\java-build-1.0-SNAPSHOT-jar-with-dependencies.jar" size="534403" download="eager" />
   </resources>

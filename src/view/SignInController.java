@@ -169,6 +169,7 @@ public class SignInController {
             if (event.getSource() instanceof PasswordField) {
                 PasswordField passw = (PasswordField) event.getSource();
                 if (passw.getText().length() <= 8) {
+                    
                     throw new InvalidPasswordException("Password must be al least 8 characters long");
 
                 }
