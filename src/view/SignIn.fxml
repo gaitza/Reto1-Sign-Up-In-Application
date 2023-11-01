@@ -16,7 +16,7 @@
 
 <Pane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="500.0" prefWidth="900.0" style="-fx-background-color: FFFFFF;" xmlns="http://javafx.com/javafx/9.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="view.SignInController">
    <children>
-      <ImageView fitHeight="500.0" fitWidth="378.0" layoutX="67.0" layoutY="76.0" pickOnBounds="true" preserveRatio="true">
+      <ImageView fitHeight="500.0" fitWidth="378.0" layoutX="72.0" layoutY="76.0" pickOnBounds="true" preserveRatio="true">
          <image>
             <Image url="@../resources/Login-amico.png" />
          </image>
@@ -31,14 +31,14 @@
             <Font size="48.0" />
          </font>
       </Text>
-      <TextField fx:id="textFieldUser" layoutX="597.0" layoutY="177.0" prefHeight="34.0" prefWidth="216.0" promptText="UserName" style="-fx-background-color: FFFFFF;" />
+      <TextField fx:id="textFieldEmail" layoutX="597.0" layoutY="177.0" prefHeight="34.0" prefWidth="216.0" promptText="UserName" style="-fx-background-color: FFFFFF;" />
       <ImageView fitHeight="34.0" fitWidth="41.0" layoutX="565.0" layoutY="177.0" pickOnBounds="true" preserveRatio="true">
          <image>
             <Image url="@../resources/account.png" />
          </image>
       </ImageView>
       <Line fx:id="lineUser" endX="100.0" layoutX="698.0" layoutY="211.0" startX="-100.0" strokeWidth="1.6" />
-      <PasswordField fx:id="password" layoutX="597.0" layoutY="250.0" prefHeight="34.0" prefWidth="216.0" promptText="Password" style="-fx-background-color: FFFFFF;">
+      <PasswordField fx:id="passwordSignIn" layoutX="597.0" layoutY="250.0" prefHeight="34.0" prefWidth="216.0" promptText="Password" style="-fx-background-color: FFFFFF;">
          <tooltip>
             <Tooltip text="The password must be at least 8 characters long and have no spaces." />
          </tooltip>
