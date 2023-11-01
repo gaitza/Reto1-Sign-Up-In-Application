@@ -6,6 +6,7 @@
 <?import javafx.scene.control.Hyperlink?>
 <?import javafx.scene.control.PasswordField?>
 <?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.ToggleButton?>
 <?import javafx.scene.control.Tooltip?>
 <?import javafx.scene.image.Image?>
 <?import javafx.scene.image.ImageView?>
@@ -16,7 +17,8 @@
 
 <Pane prefHeight="500.0" prefWidth="900.0" style="-fx-background-color: FFFFFF;" xmlns="http://javafx.com/javafx/9.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="view.SignUpController">
    <children>
-      <TextField fx:id="textFieldPassword" layoutX="562.0" layoutY="302.0" prefHeight="34.0" prefWidth="216.0" promptText="Password" style="-fx-background-color: FFFFFF;" />
+      <TextField fx:id="textFieldEmail" layoutX="560.0" layoutY="18.0" prefHeight="34.0" prefWidth="216.0" promptText="Email" style="-fx-background-color: FFFFFF;" />
+      <TextField fx:id="textFieldPassword" layoutX="562.0" layoutY="302.0" prefHeight="34.0" prefWidth="216.0" promptText="Password" style="-fx-background-color: FFFFFF;" visible="false" />
       <PasswordField fx:id="password" layoutX="558.0" layoutY="302.0" prefHeight="34.0" prefWidth="216.0" promptText="Password" style="-fx-background-color: FFFFFF;">
          <tooltip>
             <Tooltip text="The password must be at least 8 characters long and have no spaces." />
@@ -27,7 +29,6 @@
          </image>
       </ImageView>
         <TextField fx:id="textFieldPhone" accessibleText="prueba" layoutX="625.0" layoutY="119.0" prefHeight="34.0" prefWidth="148.0" promptText="PhoneNumber" style="-fx-background-color: FFFFFF;" />
-      <TextField fx:id="textFieldEmail" layoutX="560.0" layoutY="18.0" prefHeight="34.0" prefWidth="216.0" promptText="Email" style="-fx-background-color: FFFFFF;" />
       <TextField fx:id="textFieldName" layoutX="559.0" layoutY="70.0" prefHeight="34.0" prefWidth="216.0" promptText="Name" style="-fx-background-color: FFFFFF;" />
       <Line fx:id="lineInvalidPhone" accessibleText="prueba" endX="100.0" layoutX="665.0" layoutY="153.0" startX="-100.0" />
       <Line fx:id="lineInvalidPassword" endX="100.0" layoutX="666.0" layoutY="343.0" startX="-100.0" />
@@ -51,13 +52,14 @@
             <Image url="@../resources/secured.png" />
          </image>
       </ImageView>
-      <PasswordField fx:id="confirmPassword" layoutX="556.0" layoutY="361.0" prefHeight="34.0" prefWidth="216.0" promptText="ConfirmPassword" style="-fx-background-color: FFFFFF;" />
+      <PasswordField fx:id="confirmPassword" layoutX="556.0" layoutY="368.0" prefHeight="34.0" prefWidth="216.0" promptText="ConfirmPassword" style="-fx-background-color: FFFFFF;" />
+      <TextField fx:id="textFieldConfirmPassword" layoutX="556.0" layoutY="368.0" prefHeight="34.0" prefWidth="216.0" promptText="Password" style="-fx-background-color: FFFFFF;" visible="false" />
       <ImageView fitHeight="34.0" fitWidth="41.0" layoutX="524.0" layoutY="370.0" pickOnBounds="true" preserveRatio="true">
          <image>
             <Image url="@../resources/secured.png" />
          </image>
       </ImageView>
-      <Line fx:id="lineInvalidCPassword" endX="100.0" layoutX="661.0" layoutY="404.0" startX="-100.0" />
+      <Line fx:id="lineInvalidConfirmPassword" endX="100.0" layoutX="661.0" layoutY="404.0" startX="-100.0" />
       <Button fx:id="buttonSignUp" defaultButton="true" layoutX="666.0" layoutY="438.0" mnemonicParsing="false" prefHeight="34.0" prefWidth="191.0" style="-fx-background-color: #56BFAC;" text="Sign Up">
          <cursor>
             <Cursor fx:constant="HAND" />
@@ -93,22 +95,11 @@
             <Font name="Rockwell" size="12.0" />
          </font>
       </Text>
-      <ImageView fx:id="imageViewButton" fitHeight="30.0" fitWidth="30.0" layoutX="743.0" layoutY="313.0" pickOnBounds="true" preserveRatio="true">
-         <image>
-            <Image url="@../resources/iconEye.png" />
-         </image>
-      </ImageView>
       <Text layoutX="72.0" layoutY="451.0" strokeType="OUTSIDE" strokeWidth="0.0" text=" ">
          <font>
             <Font name="Arial" size="18.0" />
          </font>
       </Text>
-      <ImageView fx:id="imageViewButton" fitHeight="30.0" fitWidth="30.0" layoutX="744.0" layoutY="372.0" pickOnBounds="true" preserveRatio="true">
-         <image>
-            <Image url="@../resources/iconEye.png" />
-         </image>
-      </ImageView>
-      <TextField fx:id="textFieldConfirmPassword" layoutX="562.0" layoutY="318.0" prefHeight="34.0" prefWidth="216.0" promptText="Password" style="-fx-background-color: FFFFFF;" visible="false" />
       <Hyperlink fx:id="hyperLinkSignIn" layoutX="110.0" layoutY="437.0" text="¿Ya tienes cuenta?">
          <font>
             <Font size="18.0" />
@@ -144,5 +135,23 @@
             <Cursor fx:constant="HAND" />
          </cursor>
       </Button>
+      <ToggleButton fx:id="buttonShowHide" layoutX="720.0" layoutY="309.0" mnemonicParsing="false" style="-fx-background-color: transparent;">
+         <graphic>
+            <ImageView fx:id="imageViewButton" fitHeight="30.0" fitWidth="30.0" pickOnBounds="true" preserveRatio="true">
+               <image>
+                  <Image url="@../resources/iconEye.png" />
+               </image>
+            </ImageView>
+         </graphic>
+      </ToggleButton>
+      <ToggleButton fx:id="buttonShowHideConfirm" layoutX="720.0" layoutY="369.0" mnemonicParsing="false" style="-fx-background-color: transparent;">
+         <graphic>
+            <ImageView fx:id="imageViewButtonConfirm" fitHeight="30.0" fitWidth="30.0" pickOnBounds="true" preserveRatio="true">
+               <image>
+                  <Image url="@../resources/iconEye.png" />
+               </image>
+            </ImageView>
+         </graphic>
+      </ToggleButton>
    </children>
 </Pane>

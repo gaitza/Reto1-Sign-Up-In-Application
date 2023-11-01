@@ -68,6 +68,7 @@ public class SignInController {
     private boolean userException = false;
     String emailPattern = "[a-zA-Z0-9._-]+@[a-z]+\\.+[a-z]+";
 
+     private final ValidationHelper helper = new ValidationHelper();
     public Stage getStage() {
         return stage;
     }
@@ -152,16 +153,7 @@ public class SignInController {
      * pressed
      */
     private void handleShowHide(ActionEvent event) {
-        if (buttonShowHide.isSelected()) {
-            imageViewButton.setImage(new Image(getClass().getResourceAsStream("/resources/iconEye2.png")));
-            password.setVisible(false);
-            textFieldPassword.setVisible(true);
-        } else {
-            // Si no está presionado se muestra un passwordField y la imagen de imageShowHide es showIcon.
-            imageViewButton.setImage(new Image(getClass().getResourceAsStream("/resources/iconEye.png")));
-            password.setVisible(true);
-            textFieldPassword.setVisible(false);
-        }
+        helper.togglePasswordFieldVisibility(buttonShowHide, imageViewButton, password, textFieldPassword);
     }
 
     private void updateLabelPassword(KeyEvent event) {
@@ -227,13 +219,7 @@ public class SignInController {
     }
 
     private void copyPassword(KeyEvent event) {
-        if (password.isVisible()) {
-            // When you type a character in the passwordField it is copied to the textFieldPassword.
-            textFieldPassword.setText(password.getText());
-        } else if (textFieldPassword.isVisible()) {
-            // When you type a character in the textFieldPassword it is copied to the passwordField.
-            password.setText(textFieldPassword.getText());
-        }
+        helper.copyPassword(password, textFieldPassword);
     }
 
     private void textChanged(KeyEvent event) {
@@ -293,5 +279,4 @@ public class SignInController {
 
         }
     }
-
 }

@@ -5,20 +5,12 @@
  */
 package view;
 
-import com.google.i18n.phonenumbers.NumberParseException;
-import exceptions.CommonException;
-import exceptions.InvalidEmailValueException;
-import exceptions.InvalidPasswordException;
-import exceptions.InvalidPhoneNumberException;
-import java.io.BufferedReader;
-import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.function.UnaryOperator;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.application.Platform;
@@ -37,13 +29,10 @@ import javafx.scene.control.ComboBox;
 import javafx.scene.control.Hyperlink;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
-import javafx.scene.control.TextFormatter;
 import javafx.scene.control.ToggleButton;
-import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
-import javafx.scene.paint.Color;
 import javafx.scene.shape.Line;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
@@ -58,15 +47,15 @@ public class SignUpController {
     @FXML
     private ComboBox comboPhone;
     @FXML
-    private TextField textFieldPhone, textFieldEmail, textFieldPassword, textFieldCode, textFieldDirection, textFieldName, confirmPassword;
+    private TextField textFieldPhone, textFieldEmail, textFieldPassword, textFieldCode, textFieldDirection, textFieldName, textFieldConfirmPassword;
     @FXML
-    private Line lineInvalidPhone, lineInvalidEmail, lineInvalidDirection, lineInvalidCodePostal, lineInvalidName;
+    private Line lineInvalidPhone, lineInvalidEmail, lineInvalidDirection, lineInvalidCodePostal, lineInvalidName, lineInvalidPassword, lineInvalidConfirmPassword;
     @FXML
     private Text labelInvalidPhone, labelInvalidEmail, labelInvalidCode, labelInvalidAddress, labelInvalidPasswordConfirm, labelInvalidPassword, labelInvalidName;
     @FXML
     private Hyperlink hyperLinkSignIn;
     @FXML
-    private PasswordField password;
+    private PasswordField password, confirmPassword;
     @FXML
     private ToggleButton buttonShowHide;
     @FXML
@@ -80,16 +69,16 @@ public class SignUpController {
         {
             put("textFieldPhone", 0);
             put("textFieldEmail", 0);
-           
+            put("password", 0);
+            put("confirmPassword", 0);
             put("textFieldCode", 0);
             put("textFieldDirection", 0);
             put("textFieldName", 0);
-           
         }
     };
     private String opc;
     long quantityValuesZero = validate.values().stream().filter(valor -> valor == 0).count();
-    private ValidationHelper helper = new ValidationHelper();
+    private final ValidationHelper helper = new ValidationHelper();
     private static final Logger LOGGER = Logger.getLogger("SignUpController.class");
 
     public Stage getStage() {
@@ -107,7 +96,7 @@ public class SignUpController {
 
         stage.setTitle("SignUp");
         stage.setResizable(false);
- System.out.println(quantityValuesZero);
+        System.out.println(quantityValuesZero);
         // HyperLnk //
         //Accion de dirigir a la ventana de SignUp
         hyperLinkSignIn.setOnAction(this::SignIn);
@@ -116,7 +105,7 @@ public class SignUpController {
         //Accion de dirigir a la ventana de Welcome
         buttonSignUp.setOnAction(this::Welcome);
 
-        prefijosTelefonos = leerCsv();
+        prefijosTelefonos = helper.readCsv(acronimos);
 
         List<String> claveOrdenadas = new ArrayList<>(prefijosTelefonos.keySet());
         Collections.sort(claveOrdenadas);
@@ -129,105 +118,123 @@ public class SignUpController {
             }
         });
 
-        UnaryOperator<TextFormatter.Change> filter = change -> {
-            String newText = change.getControlNewText();
-            if (newText.endsWith("@h")) {
-                change.setText("hotmail.com");
-                change.setCaretPosition(change.getCaretPosition() + "otmail.com".length());
-            } else if (newText.endsWith("@g")) {
-                change.setText("gmail.com");
-                change.setCaretPosition(change.getCaretPosition() + "mail.com".length());
-            }
-            return change;
-        };
+        helper.formatEmailTextField(textFieldEmail);
 
-        TextFormatter<String> textFormatter = new TextFormatter<>(filter);
-        textFieldEmail.setTextFormatter(textFormatter);
+        password.setOnKeyReleased(this::copyPassword);
+        password.setOnKeyTyped(this::updateLabel);
+        password.focusedProperty().addListener(this::focusChange);
+
+        textFieldPassword.focusedProperty().addListener(this::focusChange);
+        textFieldPassword.setOnKeyReleased(this::copyPassword);
+        textFieldPassword.setOnKeyTyped(this::updateLabel);
+
         textFieldEmail.focusedProperty().addListener(this::focusChange);
         textFieldEmail.setOnKeyPressed(this::confirmarEmail);
+        textFieldEmail.setOnKeyTyped(this::updateLabel);
 
         textFieldPhone.focusedProperty().addListener(this::focusChange);
+        textFieldPhone.setOnKeyTyped(this::updateLabel);
 
         textFieldCode.focusedProperty().addListener(this::focusChange);
+        textFieldCode.setOnKeyTyped(this::updateLabel);
 
         textFieldName.focusedProperty().addListener(this::focusChange);
+        textFieldName.setOnKeyTyped(this::updateLabel);
 
         textFieldDirection.focusedProperty().addListener(this::focusChange);
-        
-        textFieldCode.setOnKeyTyped(this::updateLabel);
-        textFieldPhone.setOnKeyTyped(this::updateLabel);
-        textFieldName.setOnKeyTyped(this::updateLabel);
         textFieldDirection.setOnKeyTyped(this::updateLabel);
-        textFieldEmail.setOnKeyTyped(this::updateLabel);
-       
+
+        textFieldConfirmPassword.setOnKeyReleased(this::copyPassword);
+        textFieldConfirmPassword.setOnKeyTyped(this::updateLabel);
+        textFieldConfirmPassword.focusedProperty().addListener(this::focusChange);
+
+        confirmPassword.setOnKeyReleased(this::copyPassword);
+        confirmPassword.setOnKeyTyped(this::updateLabel);
+        confirmPassword.focusedProperty().addListener(this::focusChange);
+
+        buttonShowHide.setOnAction(this::handleShowHide);
+
         stage.show();
 
         LOGGER.info("SingUp window initialized");
     }
 
+    private void copyPassword(KeyEvent event) {
+        helper.copyPassword(password, textFieldPassword);
+    }
+
+    /**
+     * Check what state (pressed/not pressed) the password is in.
+     *
+     * @param event an ActionEvent.ACTION event type for when the button is
+     * pressed
+     */
+    private void handleShowHide(ActionEvent event) {
+        helper.togglePasswordFieldVisibility(buttonShowHide, imageViewButton, password, textFieldPassword);
+    }
+
     private void updateLabel(KeyEvent event) {
         if (quantityValuesZero == 1) {
-            String field = "";
-            String value = " ";
             if (event.getSource() instanceof PasswordField) {
                 PasswordField passw = (PasswordField) event.getSource();
-                field = passw.getId();
-                value = passw.getText();
+                callValidation(passw.getId(), passw.getText());
             }
             if (event.getSource() instanceof TextField) {
                 TextField textField = (TextField) event.getSource();
-                field = textField.getId();
-                value = textField.getText();
+                callValidation(textField.getId(), textField.getText());
             }
-            callValidation(field, value);
         }
     }
 
     private void focusChange(ObservableValue observable, Boolean oldValue, Boolean newValue) {
         if (oldValue) {
-            String field = " ";
-            String value = " ";
+            String field = "";
+            String value = "";
             try {
                 ReadOnlyBooleanProperty focusedProperty = (ReadOnlyBooleanProperty) observable;
                 Node node = (Node) focusedProperty.getBean();
-                if (node instanceof TextField) {
-                    TextField textField = (TextField) node;
-                    field = textField.getId();
-                    value = textField.getText();
-                }
 
+                field = ((Node) node).getId();
+                value = ((TextField) node).getText(); // Obtenemos el texto del TextField
+                if (field.equals("textFieldPassword")) {
+                    field = "password";
+                    value = textFieldPassword.getText();
+                } else if (field.equals("textFieldConfirmPassword")) {
+                    value = textFieldConfirmPassword.getText();
+                    field = "confirmPassword";
+                }
             } catch (Exception e) {
                 field = opc;
             }
-            callValidation(field,value);
+            callValidation(field, value);
+            quantityValuesZero = validate.values().stream().filter(valor -> valor == 0).count();
         }
     }
 
     private void callValidation(String field, String value) {
-        
-         String acro = acronimos.get(comboPhone.getValue());
+
+        String acro = acronimos.get(comboPhone.getValue());
         if (field.equalsIgnoreCase("textFieldCode")) {
-            String val = textFieldCode.getText();
-            helper.executeValidations(field, value, lineInvalidCodePostal, labelInvalidCode, value, validate);
-            System.out.println(validate.get("textFieldCode"));
+            validate.put("textFieldCode", 0);
+            helper.executeValidations(field, !value.isEmpty() ? value : textFieldCode.getText(), lineInvalidCodePostal, labelInvalidCode, value, validate);
         } else if (field.equalsIgnoreCase("textFieldName")) {
-            String val = textFieldName.getText();
-            helper.executeValidations(field, value, lineInvalidName, labelInvalidName, value, validate);
+            validate.put("textFieldName", 0);
+            helper.executeValidations(field, !value.isEmpty() ? value : textFieldName.getText(), lineInvalidName, labelInvalidName, value, validate);
         } else if (field.equalsIgnoreCase("textFieldDirection")) {
-            String val = textFieldDirection.getText();
-            helper.executeValidations(field, value, lineInvalidDirection, labelInvalidAddress, value, validate);
+            validate.put("textFieldDirection", 0);
+            helper.executeValidations(field, !value.isEmpty() ? value : textFieldDirection.getText(), lineInvalidDirection, labelInvalidAddress, value, validate);
         } else if (field.equalsIgnoreCase("textFieldPhone")) {
-            String val = textFieldPhone.getText();
-            helper.executeValidations(field, value, lineInvalidPhone, labelInvalidPhone, acro, validate);
+            validate.put("textFieldPhone", 0);
+            helper.executeValidations(field, !value.isEmpty() ? value : textFieldPhone.getText(), lineInvalidPhone, labelInvalidPhone, acro, validate);
         } else if (field.equalsIgnoreCase("textFieldEmail")) {
-            String val = textFieldEmail.getText();
-            helper.executeValidations(field, value, lineInvalidEmail, labelInvalidEmail, value, validate);
-        } else if (field.equalsIgnoreCase("textFieldPassword")) {
-            String val = textFieldPassword.getText();
-            helper.executeValidations(field, value, lineInvalidCodePostal, labelInvalidCode, value, validate);
+            validate.put("textFieldEmail", 0);
+            helper.executeValidations(field, !value.isEmpty() ? value : textFieldEmail.getText(), lineInvalidEmail, labelInvalidEmail, value, validate);
+        } else if (field.equalsIgnoreCase("password")) {
+            validate.put("password", 0);
+            helper.executeValidations(field, !value.isEmpty() ? value : password.getText(), lineInvalidPassword, labelInvalidPassword, value, validate);
         } else if (field.equalsIgnoreCase("confirmPassword")) {
-            String val = confirmPassword.getText();
-            helper.executeValidations(field, value, lineInvalidCodePostal, labelInvalidCode, value, validate);
+            validate.put("confirmPassword", 0);
+            helper.executeValidations(field, !value.isEmpty() ? value : confirmPassword.getText(), lineInvalidConfirmPassword, labelInvalidPasswordConfirm, password.getText(), validate);
         }
     }
 
@@ -254,27 +261,6 @@ public class SignUpController {
         }
     }
 
-    public static Map<String, String> leerCsv() {
-        Map<String, String> datos = new HashMap<>();
-
-        try (BufferedReader reader = new BufferedReader(new FileReader(".\\src\\resources\\paises.csv"))) {
-            String linea;
-            while ((linea = reader.readLine()) != null) {
-                String[] partes = linea.split(",");
-                String clave = partes[1].replaceAll("^\"|\"$", ""); // Remove quotes
-                String valor = partes[5].replaceAll("^\"|\"$", ""); // Remove quotes
-                String acronimo = partes[3].replaceAll("^\"|\"$", ""); //Remove quotes
-                if (!clave.equals(" name")) {
-                    datos.put(clave, valor);
-                    acronimos.put(valor, acronimo);
-                }
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return datos;
-    }
-
     private void SignIn(ActionEvent event) {
         try {
 
@@ -294,35 +280,17 @@ public class SignUpController {
         }
     }
 
-    /**
-     * Check what state (pressed/not pressed) the password is in.
-     *
-     * @param event an ActionEvent.ACTION event type for when the button is
-     * pressed
-     */
-    private void handleShowHide(ActionEvent event) {
-        if (buttonShowHide.isSelected()) {
-            imageViewButton.setImage(new Image(getClass().getResourceAsStream("/resources/iconEye2.png")));
-            password.setVisible(false);
-            textFieldPassword.setVisible(true);
-        } else {
-            // Si no está presionado se muestra un passwordField y la imagen de imageShowHide es showIcon.
-            imageViewButton.setImage(new Image(getClass().getResourceAsStream("/resources/iconEye.png")));
-            password.setVisible(true);
-            textFieldPassword.setVisible(false);
-        }
-    }
-
     private void Welcome(ActionEvent event) {
         try {
             ObservableValue observable = null;
+            password.setVisible(true);
+            confirmPassword.setVisible(true);
             for (Map.Entry<String, Integer> entry : validate.entrySet()) {
                 if (entry.getValue() == 0) {
                     opc = entry.getKey();
                     focusChange(observable, Boolean.TRUE, Boolean.FALSE);
                 }
             }
-
             if (quantityValuesZero != 0) {
                 String msg = "Error some data is wrong";
                 Alert alert = new Alert(Alert.AlertType.ERROR, msg);

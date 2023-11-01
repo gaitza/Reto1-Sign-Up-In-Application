@@ -10,12 +10,23 @@ import com.google.i18n.phonenumbers.PhoneNumberUtil;
 import com.google.i18n.phonenumbers.Phonenumber;
 import exceptions.CommonException;
 import exceptions.InvalidEmailValueException;
+import exceptions.InvalidPasswordException;
 import exceptions.InvalidPhoneNumberException;
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.util.HashMap;
 import java.util.Map;
+import java.util.function.UnaryOperator;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import javafx.scene.control.PasswordField;
+import javafx.scene.control.TextField;
+import javafx.scene.control.TextFormatter;
+import javafx.scene.control.ToggleButton;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Line;
 import javafx.scene.text.Text;
@@ -47,7 +58,6 @@ public class ValidationHelper {
                 throw new CommonException("symbols");
             }
         }
-
     }
 
     public void phoneNumberValidation(String number, String acro) throws CommonException, InvalidPhoneNumberException, NumberParseException {
@@ -115,7 +125,81 @@ public class ValidationHelper {
         }
     }
 
-    public void executeValidations(String opc, String value, Line line, Text label, String acro,  Map<String, Integer> validate) {
+    public void passwordValidation(String password, String confirmPassword) throws CommonException, InvalidPasswordException {
+
+        if (password.length() < 8) {
+            throw new InvalidPasswordException("Password must be al least 8 characters long");
+        }
+        if (!confirmPassword.equals(password)) {
+            throw new InvalidPasswordException("Passwords must match");
+        }
+    }
+
+    public Map<String, String> readCsv(Map acronimos) {
+        Map<String, String> datos = new HashMap<>();
+
+        try (BufferedReader reader = new BufferedReader(new FileReader(".\\src\\resources\\paises.csv"))) {
+            String linea;
+            while ((linea = reader.readLine()) != null) {
+                String[] partes = linea.split(",");
+                String clave = partes[1].replaceAll("^\"|\"$", ""); // Remove quotes
+                String valor = partes[5].replaceAll("^\"|\"$", ""); // Remove quotes
+                String acronimo = partes[3].replaceAll("^\"|\"$", ""); //Remove quotes
+                if (!clave.equals(" name")) {
+                    datos.put(clave, valor);
+                    acronimos.put(valor, acronimo);
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return datos;
+    }
+
+    public void formatEmailTextField(TextField textFieldEmail) {
+        UnaryOperator<TextFormatter.Change> filter = change -> {
+            String newText = change.getControlNewText();
+            if (newText.endsWith("@h")) {
+                change.setText("hotmail.com");
+                change.setCaretPosition(change.getCaretPosition() + "otmail.com".length());
+            } else if (newText.endsWith("@g")) {
+                change.setText("gmail.com");
+                change.setCaretPosition(change.getCaretPosition() + "mail.com".length());
+            }
+            return change;
+        };
+
+        TextFormatter<String> textFormatter = new TextFormatter<>(filter);
+        textFieldEmail.setTextFormatter(textFormatter);
+    }
+
+    /**
+     * Check what state (pressed/not pressed) the password is in.
+     *
+     * @param event an ActionEvent.ACTION event type for when the button is
+     * pressed
+     */
+    public void togglePasswordFieldVisibility(ToggleButton buttonShowHide, ImageView imageViewButton, PasswordField password, TextField textFieldPassword) {
+        if (buttonShowHide.isSelected()) {
+            imageViewButton.setImage(new Image(getClass().getResourceAsStream("/resources/iconEye2.png")));
+            password.setVisible(false);
+            textFieldPassword.setVisible(true);
+        } else {
+            imageViewButton.setImage(new Image(getClass().getResourceAsStream("/resources/iconEye.png")));
+            password.setVisible(true);
+            textFieldPassword.setVisible(false);
+        }
+    }
+
+    public void copyPassword(PasswordField password, TextField textFieldPassword) {
+        if (password.isVisible()) {
+            textFieldPassword.setText(password.getText());
+        } else if (textFieldPassword.isVisible()) {
+            password.setText(textFieldPassword.getText());
+        }
+    }
+
+    public void executeValidations(String opc, String value, Line line, Text label, String acro, Map<String, Integer> validate) {
 
         switch (opc) {
             case "textFieldName":
@@ -157,7 +241,7 @@ public class ValidationHelper {
                     LOGGER.info(ex.getMessage());
                     label.setText(ex.getMessage());
                 } catch (NumberParseException ex) {
-                    Logger.getLogger(SignUpController.class.getName()).log(Level.SEVERE, null, ex);
+                    LOGGER.info(ex.getMessage());
                 }
                 break;
             case "textFieldEmail":
@@ -175,7 +259,36 @@ public class ValidationHelper {
 
                 }
                 break;
-            case "textFieldPassword":
+            case "password":
+                try {
+                    commomValidations(value, false, false);
+                    passwordValidation(value, acro);
+
+                    line.setStroke(Color.GREY);
+                    label.setText("");
+                    
+                    validate.put("password", 1);
+                } catch (InvalidPasswordException | CommonException ex) {
+                    LOGGER.info(ex.getMessage());
+                    line.setStroke(Color.RED);
+                    label.setText(ex.getMessage());
+
+                }
+                break;
+            case "confirmPassword":
+                try {
+                    commomValidations(value, false, false);
+                    passwordValidation(value, acro);
+
+                    line.setStroke(Color.GREY);
+                    label.setText("");
+                    
+                    validate.put("confirmPassword", 1);
+                } catch (InvalidPasswordException | CommonException ex) {
+                    LOGGER.info(ex.getMessage());
+                    line.setStroke(Color.RED);
+                    label.setText(ex.getMessage());
+                }
                 break;
             case "textFieldCode":
                 try {
@@ -189,10 +302,20 @@ public class ValidationHelper {
                     LOGGER.info(ex.getMessage());
                     line.setStroke(Color.RED);
                     label.setText(ex.getMessage());
-
                 }
                 break;
-            case "confirmPassword":
+            case "passwordSignIn":
+                try {
+                    commomValidations(value, false, false);
+
+                    line.setStroke(Color.GREY);
+                    label.setText("");
+                    validate.put("textFieldEmail", 1);
+                } catch (CommonException ex) {
+                    LOGGER.info(ex.getMessage());
+                    line.setStroke(Color.RED);
+                    label.setText(ex.getMessage());
+                }
                 break;
             default:
                 break;
