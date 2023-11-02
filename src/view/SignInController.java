@@ -5,9 +5,11 @@
  */
 package view;
 
+import exceptions.CommonException;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.beans.property.ReadOnlyBooleanProperty;
 import javafx.beans.value.ObservableValue;
@@ -17,6 +19,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.Hyperlink;
 import javafx.scene.control.PasswordField;
@@ -61,13 +64,14 @@ public class SignInController {
     private ImageView imageViewButton;
 
     private Color customColorGreen = Color.web("#14FF0D");
-
+    String opc;
     Map<String, Integer> validate = new HashMap<String, Integer>() {
         {
             put("textFieldEmail", 0);
             put("passwordSignIn", 0);
         }
     };
+    long quantityValuesZero = validate.values().stream().filter(valor -> valor == 0).count();
     private final ValidationHelper helper = new ValidationHelper();
 
     public Stage getStage() {
@@ -166,28 +170,38 @@ public class SignInController {
     }
 
     private void focusedChange(ObservableValue observable, Boolean oldValue, Boolean newValue) {
-
         if (oldValue) {
+            String field = "";
             if (oldValue) {
                 try {
                     ReadOnlyBooleanProperty focusedProperty = (ReadOnlyBooleanProperty) observable;
                     Node node = (Node) focusedProperty.getBean();
+                    field = node.getId();
 
-                    if (node.getId().equals("textFieldEmail")) {
-                        helper.executeValidations(textFieldEmail.getId(), textFieldEmail.getText(), lineUser, labelInvalidUser, "", validate);
-                    } else if (node.getId().equals("passwordSignIn")) {
-                        helper.executeValidations(passwordSignIn.getId(), passwordSignIn.getText(), linePassword, labelInvalidPassword, "", validate);
-                    }
                 } catch (Exception e) {
-
+                    field = opc;
+                }
+                if (field.equals("textFieldEmail")) {
+                    helper.executeValidations(textFieldEmail.getId(), textFieldEmail.getText(), lineUser, labelInvalidUser, "", validate);
+                } else if (field.equals("passwordSignIn") || field.equals("textFieldPassword")) {
+                    helper.executeValidations(passwordSignIn.getId(), passwordSignIn.getText(), linePassword, labelInvalidPassword, "", validate);
                 }
             }
-
         }
     }
 
     private void Welcome(ActionEvent event) {
         try {
+            if (quantityValuesZero != 0) {
+                ObservableValue observable = null;
+                for (Map.Entry<String, Integer> entry : validate.entrySet()) {
+                    if (entry.getValue() == 0) {
+                        opc = entry.getKey();
+                        focusedChange(observable, Boolean.TRUE, Boolean.FALSE);
+                    }
+                }
+                throw new CommonException("");
+            }
             stage.close();
             LOGGER.info("SignIn window closed");
             FXMLLoader loader = new FXMLLoader(getClass().getClassLoader().getResource("view/Welcome.fxml"));
@@ -199,8 +213,10 @@ public class SignInController {
 
             controller.initStage(root);
             LOGGER.info("Welcome window opened");
-        } catch (IOException ex) {
-
+        } catch (CommonException | IOException ex) {
+            Alert alert = new Alert(Alert.AlertType.ERROR, ex.getMessage());
+            alert.show();
+            LOGGER.log(Level.SEVERE, ex.getMessage());
         }
     }
 }

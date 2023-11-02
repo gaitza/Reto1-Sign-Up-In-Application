@@ -5,6 +5,7 @@
  */
 package view;
 
+import exceptions.CommonException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -292,11 +293,7 @@ public class SignUpController {
                 }
             }
             if (quantityValuesZero != 0) {
-                String msg = "Error some data is wrong";
-                Alert alert = new Alert(Alert.AlertType.ERROR, msg);
-                alert.show();
-                LOGGER.log(Level.SEVERE, msg);
-                return;
+                throw new CommonException("");
             }
             stage.close();
             LOGGER.info("SignUp window closed");
@@ -310,8 +307,10 @@ public class SignUpController {
             controller.initStage(root);
 
             LOGGER.info("Welcome window opened");
-        } catch (IOException ex) {
-
+        } catch (CommonException | IOException ex) {
+            Alert alert = new Alert(Alert.AlertType.ERROR, ex.getMessage());
+            alert.show();
+            LOGGER.log(Level.SEVERE, ex.getMessage());
         }
     }
 }

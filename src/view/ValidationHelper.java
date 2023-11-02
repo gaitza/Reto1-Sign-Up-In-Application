@@ -310,7 +310,7 @@ public class ValidationHelper {
 
                     line.setStroke(Color.GREY);
                     label.setText("");
-                    validate.put("textFieldEmail", 1);
+                    validate.put("passwordSignIn", 1);
                 } catch (CommonException ex) {
                     LOGGER.info(ex.getMessage());
                     line.setStroke(Color.RED);
