@@ -5,7 +5,13 @@
  */
 package view;
 
+import DataTransferObjects.Model;
+import DataTransferObjects.User;
 import exceptions.CommonException;
+import exceptions.ConnectionErrorException;
+import exceptions.MaxConnectionException;
+import exceptions.TimeOutException;
+import exceptions.UserExistException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -37,6 +43,7 @@ import javafx.scene.input.KeyEvent;
 import javafx.scene.shape.Line;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
+import model.ModelFactory;
 
 /**
  *
@@ -264,7 +271,6 @@ public class SignUpController {
 
     private void SignIn(ActionEvent event) {
         try {
-
             stage.close();
             LOGGER.info("SignUp window closed");
             FXMLLoader loader = new FXMLLoader(getClass().getClassLoader().getResource("view/SignIn.fxml"));
@@ -283,34 +289,42 @@ public class SignUpController {
 
     private void Welcome(ActionEvent event) {
         try {
-            ObservableValue observable = null;
+
             password.setVisible(true);
             confirmPassword.setVisible(true);
             for (Map.Entry<String, Integer> entry : validate.entrySet()) {
                 if (entry.getValue() == 0) {
                     opc = entry.getKey();
-                    focusChange(observable, Boolean.TRUE, Boolean.FALSE);
+                    focusChange(null, Boolean.TRUE, Boolean.FALSE);
                 }
             }
             if (quantityValuesZero != 0) {
                 throw new CommonException("");
             }
-            stage.close();
-            LOGGER.info("SignUp window closed");
-            FXMLLoader loader = new FXMLLoader(getClass().getClassLoader().getResource("view/Welcome.fxml"));
-            Parent root = (Parent) loader.load();
+            Model model = ModelFactory.getModel();
+            User user = new User(textFieldEmail.getText(), textFieldName.getText(), textFieldDirection.getText(), Integer.parseInt(textFieldCode.getText()), Integer.parseInt(textFieldPhone.getText()), textFieldPassword.getText());
+            model.doSignUp(user);
+            try {
+                stage.close();
+                LOGGER.info("SignUp window closed");
+                FXMLLoader loader = new FXMLLoader(getClass().getClassLoader().getResource("view/Welcome.fxml"));
+                Parent root = (Parent) loader.load();
 
-            WelcomeController controller = ((WelcomeController) loader.getController());
+                WelcomeController controller = ((WelcomeController) loader.getController());
 
-            controller.setStage(new Stage());
+                controller.setStage(new Stage());
 
-            controller.initStage(root);
+                controller.initStage(root);
 
-            LOGGER.info("Welcome window opened");
-        } catch (CommonException | IOException ex) {
+                LOGGER.info("Welcome window opened");
+            } catch (Exception ex) {
+                Logger.getLogger(SignInController.class.getName()).log(Level.SEVERE, null, ex);
+            }
+
+        } catch (CommonException | UserExistException | ConnectionErrorException | TimeOutException | MaxConnectionException ex) {
             Alert alert = new Alert(Alert.AlertType.ERROR, ex.getMessage());
             alert.show();
             LOGGER.log(Level.SEVERE, ex.getMessage());
-        }
+        } 
     }
 }

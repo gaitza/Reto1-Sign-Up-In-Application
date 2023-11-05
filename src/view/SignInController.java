@@ -215,7 +215,6 @@ public class SignInController {
             user.setPassword(textFieldPassword.getText());
             user = model.doSignIn(user);
             try {
-
                 stage.close();
                 LOGGER.info("SignIn window closed");
                 FXMLLoader loader = new FXMLLoader(getClass().getClassLoader().getResource("view/Welcome.fxml"));
