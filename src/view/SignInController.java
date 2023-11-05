@@ -5,7 +5,13 @@
  */
 package view;
 
+import DataTransferObjects.Model;
+import DataTransferObjects.User;
 import exceptions.CommonException;
+import exceptions.ConnectionErrorException;
+import exceptions.InvalidUserException;
+import exceptions.MaxConnectionException;
+import exceptions.TimeOutException;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
@@ -31,6 +37,7 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Line;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
+import model.ModelFactory;
 
 /**
  *
@@ -192,28 +199,39 @@ public class SignInController {
 
     private void Welcome(ActionEvent event) {
         try {
+            quantityValuesZero = validate.values().stream().filter(valor -> valor == 0).count();
             if (quantityValuesZero != 0) {
-                ObservableValue observable = null;
                 for (Map.Entry<String, Integer> entry : validate.entrySet()) {
                     if (entry.getValue() == 0) {
                         opc = entry.getKey();
-                        focusedChange(observable, Boolean.TRUE, Boolean.FALSE);
+                        focusedChange(null, Boolean.TRUE, Boolean.FALSE);
                     }
                 }
                 throw new CommonException("");
             }
-            stage.close();
-            LOGGER.info("SignIn window closed");
-            FXMLLoader loader = new FXMLLoader(getClass().getClassLoader().getResource("view/Welcome.fxml"));
-            Parent root = (Parent) loader.load();
+            Model model = ModelFactory.getModel();
+            User user = new User();
+            user.setEmail(textFieldEmail.getText());
+            user.setPassword(textFieldPassword.getText());
+            user = model.doSignIn(user);
+            try {
 
-            WelcomeController controller = ((WelcomeController) loader.getController());
+                stage.close();
+                LOGGER.info("SignIn window closed");
+                FXMLLoader loader = new FXMLLoader(getClass().getClassLoader().getResource("view/Welcome.fxml"));
+                Parent root = (Parent) loader.load();
 
-            controller.setStage(new Stage());
+                WelcomeController controller = ((WelcomeController) loader.getController());
 
-            controller.initStage(root);
-            LOGGER.info("Welcome window opened");
-        } catch (CommonException | IOException ex) {
+                controller.setStage(new Stage());
+
+                controller.initStage(root);
+                LOGGER.info("Welcome window opened");
+            } catch (Exception ex) {
+                Logger.getLogger(SignInController.class.getName()).log(Level.SEVERE, null, ex);
+            }
+
+        } catch (CommonException | InvalidUserException | MaxConnectionException | ConnectionErrorException | TimeOutException ex) {
             Alert alert = new Alert(Alert.AlertType.ERROR, ex.getMessage());
             alert.show();
             LOGGER.log(Level.SEVERE, ex.getMessage());
