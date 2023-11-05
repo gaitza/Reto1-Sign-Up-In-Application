@@ -5,10 +5,19 @@
  */
 package model;
 
+import DataTransferObjects.Model;
+
 /**
  *
  * @author bayro
  */
 public class ModelFactory {
-    
+    private static Model model;
+
+    public static Model getModel() {
+        if (model == null) {
+            model = new ModelImplementation();
+        }
+        return model;
+    }
 }
