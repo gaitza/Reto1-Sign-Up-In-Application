@@ -5,48 +5,45 @@
  */
 package view;
 
-import com.google.i18n.phonenumbers.NumberParseException;
-import com.google.i18n.phonenumbers.PhoneNumberUtil;
-import com.google.i18n.phonenumbers.PhoneNumberUtil.PhoneNumberFormat;
-import com.google.i18n.phonenumbers.Phonenumber.PhoneNumber;
-import exceptions.InvalidEmailValueException;
-import exceptions.InvalidPhoneNumberException;
-import java.io.BufferedReader;
-import java.io.FileReader;
+import DataTransferObjects.Model;
+import DataTransferObjects.User;
+import exceptions.CommonException;
+import exceptions.ConnectionErrorException;
+import exceptions.MaxConnectionException;
+import exceptions.TimeOutException;
+import exceptions.UserExistException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.function.UnaryOperator;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import javafx.application.Platform;
+import javafx.beans.property.ReadOnlyBooleanProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Hyperlink;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
-import javafx.scene.control.TextFormatter;
 import javafx.scene.control.ToggleButton;
-import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
-import javafx.scene.paint.Color;
 import javafx.scene.shape.Line;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
+import model.ModelFactory;
 
 /**
  *
@@ -58,15 +55,15 @@ public class SignUpController {
     @FXML
     private ComboBox comboPhone;
     @FXML
-    private TextField textFieldPhone, textFieldEmail, textFieldPassword;
+    private TextField textFieldPhone, textFieldEmail, textFieldPassword, textFieldCode, textFieldDirection, textFieldName, textFieldConfirmPassword;
     @FXML
-    private Line lineInvalidPhone, lineInvalidEmail;
+    private Line lineInvalidPhone, lineInvalidEmail, lineInvalidDirection, lineInvalidCodePostal, lineInvalidName, lineInvalidPassword, lineInvalidConfirmPassword;
     @FXML
-    private Text labelInvalidPhone, labelInvalidEmail;
+    private Text labelInvalidPhone, labelInvalidEmail, labelInvalidCode, labelInvalidAddress, labelInvalidPasswordConfirm, labelInvalidPassword, labelInvalidName;
     @FXML
     private Hyperlink hyperLinkSignIn;
     @FXML
-    private PasswordField password;
+    private PasswordField password, confirmPassword;
     @FXML
     private ToggleButton buttonShowHide;
     @FXML
@@ -76,8 +73,20 @@ public class SignUpController {
 
     private Map<String, String> prefijosTelefonos;
     private static Map<String, String> acronimos = new HashMap<>();
-    String emailPattern = "[a-zA-Z0-9._-]+@[a-z]+\\.+[a-z]+";
-
+    Map<String, Integer> validate = new HashMap<String, Integer>() {
+        {
+            put("textFieldPhone", 0);
+            put("textFieldEmail", 0);
+            put("password", 0);
+            put("confirmPassword", 0);
+            put("textFieldCode", 0);
+            put("textFieldDirection", 0);
+            put("textFieldName", 0);
+        }
+    };
+    private String opc;
+    long quantityValuesZero = validate.values().stream().filter(valor -> valor == 0).count();
+    private final ValidationHelper helper = new ValidationHelper();
     private static final Logger LOGGER = Logger.getLogger("SignUpController.class");
 
     public Stage getStage() {
@@ -95,16 +104,16 @@ public class SignUpController {
 
         stage.setTitle("SignUp");
         stage.setResizable(false);
-
+        System.out.println(quantityValuesZero);
         // HyperLnk //
         //Accion de dirigir a la ventana de SignUp
-        hyperLinkSignIn.setOnAction(event -> SignIn());
+        hyperLinkSignIn.setOnAction(this::SignIn);
 
         // ButtonSignIn //
         //Accion de dirigir a la ventana de Welcome
         buttonSignUp.setOnAction(this::Welcome);
 
-        prefijosTelefonos = leerCsv();
+        prefijosTelefonos = helper.readCsv(acronimos);
 
         List<String> claveOrdenadas = new ArrayList<>(prefijosTelefonos.keySet());
         Collections.sort(claveOrdenadas);
@@ -117,26 +126,124 @@ public class SignUpController {
             }
         });
 
-        UnaryOperator<TextFormatter.Change> filter = change -> {
-            String newText = change.getControlNewText();
-            if (newText.endsWith("@h")) {
-                change.setText("hotmail.com");
-                change.setCaretPosition(change.getCaretPosition() + "otmail.com".length());
-            } else if (newText.endsWith("@g")) {
-                change.setText("gmail.com");
-                change.setCaretPosition(change.getCaretPosition() + "mail.com".length());
-            }
-            return change;
-        };
+        helper.formatEmailTextField(textFieldEmail);
 
-        TextFormatter<String> textFormatter = new TextFormatter<>(filter);
-        textFieldEmail.setTextFormatter(textFormatter);
+        password.setOnKeyReleased(this::copyPassword);
+        password.setOnKeyTyped(this::updateLabel);
+        password.focusedProperty().addListener(this::focusChange);
 
-        textFieldPhone.focusedProperty().addListener(this::focusedChangePhone);
-        textFieldEmail.focusedProperty().addListener(this::focusedChangeEmail);
+        textFieldPassword.focusedProperty().addListener(this::focusChange);
+        textFieldPassword.setOnKeyReleased(this::copyPassword);
+        textFieldPassword.setOnKeyTyped(this::updateLabel);
+
+        textFieldEmail.focusedProperty().addListener(this::focusChange);
         textFieldEmail.setOnKeyPressed(this::confirmarEmail);
+        textFieldEmail.setOnKeyTyped(this::updateLabel);
+
+        textFieldPhone.focusedProperty().addListener(this::focusChange);
+        textFieldPhone.setOnKeyTyped(this::updateLabel);
+
+        textFieldCode.focusedProperty().addListener(this::focusChange);
+        textFieldCode.setOnKeyTyped(this::updateLabel);
+
+        textFieldName.focusedProperty().addListener(this::focusChange);
+        textFieldName.setOnKeyTyped(this::updateLabel);
+
+        textFieldDirection.focusedProperty().addListener(this::focusChange);
+        textFieldDirection.setOnKeyTyped(this::updateLabel);
+
+        textFieldConfirmPassword.setOnKeyReleased(this::copyPassword);
+        textFieldConfirmPassword.setOnKeyTyped(this::updateLabel);
+        textFieldConfirmPassword.focusedProperty().addListener(this::focusChange);
+
+        confirmPassword.setOnKeyReleased(this::copyPassword);
+        confirmPassword.setOnKeyTyped(this::updateLabel);
+        confirmPassword.focusedProperty().addListener(this::focusChange);
+
+        buttonShowHide.setOnAction(this::handleShowHide);
+
         stage.show();
+
         LOGGER.info("SingUp window initialized");
+    }
+
+    private void copyPassword(KeyEvent event) {
+        helper.copyPassword(password, textFieldPassword);
+    }
+
+    /**
+     * Check what state (pressed/not pressed) the password is in.
+     *
+     * @param event an ActionEvent.ACTION event type for when the button is
+     * pressed
+     */
+    private void handleShowHide(ActionEvent event) {
+        helper.togglePasswordFieldVisibility(buttonShowHide, imageViewButton, password, textFieldPassword);
+    }
+
+    private void updateLabel(KeyEvent event) {
+        if (quantityValuesZero == 1) {
+            if (event.getSource() instanceof PasswordField) {
+                PasswordField passw = (PasswordField) event.getSource();
+                callValidation(passw.getId(), passw.getText());
+            }
+            if (event.getSource() instanceof TextField) {
+                TextField textField = (TextField) event.getSource();
+                callValidation(textField.getId(), textField.getText());
+            }
+        }
+    }
+
+    private void focusChange(ObservableValue observable, Boolean oldValue, Boolean newValue) {
+        if (oldValue) {
+            String field = "";
+            String value = "";
+            try {
+                ReadOnlyBooleanProperty focusedProperty = (ReadOnlyBooleanProperty) observable;
+                Node node = (Node) focusedProperty.getBean();
+
+                field = ((Node) node).getId();
+                value = ((TextField) node).getText(); // Obtenemos el texto del TextField
+                if (field.equals("textFieldPassword")) {
+                    field = "password";
+                    value = textFieldPassword.getText();
+                } else if (field.equals("textFieldConfirmPassword")) {
+                    value = textFieldConfirmPassword.getText();
+                    field = "confirmPassword";
+                }
+            } catch (Exception e) {
+                field = opc;
+            }
+            callValidation(field, value);
+            quantityValuesZero = validate.values().stream().filter(valor -> valor == 0).count();
+        }
+    }
+
+    private void callValidation(String field, String value) {
+
+        String acro = acronimos.get(comboPhone.getValue());
+        if (field.equalsIgnoreCase("textFieldCode")) {
+            validate.put("textFieldCode", 0);
+            helper.executeValidations(field, !value.isEmpty() ? value : textFieldCode.getText(), lineInvalidCodePostal, labelInvalidCode, value, validate);
+        } else if (field.equalsIgnoreCase("textFieldName")) {
+            validate.put("textFieldName", 0);
+            helper.executeValidations(field, !value.isEmpty() ? value : textFieldName.getText(), lineInvalidName, labelInvalidName, value, validate);
+        } else if (field.equalsIgnoreCase("textFieldDirection")) {
+            validate.put("textFieldDirection", 0);
+            helper.executeValidations(field, !value.isEmpty() ? value : textFieldDirection.getText(), lineInvalidDirection, labelInvalidAddress, value, validate);
+        } else if (field.equalsIgnoreCase("textFieldPhone")) {
+            validate.put("textFieldPhone", 0);
+            helper.executeValidations(field, !value.isEmpty() ? value : textFieldPhone.getText(), lineInvalidPhone, labelInvalidPhone, acro, validate);
+        } else if (field.equalsIgnoreCase("textFieldEmail")) {
+            validate.put("textFieldEmail", 0);
+            helper.executeValidations(field, !value.isEmpty() ? value : textFieldEmail.getText(), lineInvalidEmail, labelInvalidEmail, value, validate);
+        } else if (field.equalsIgnoreCase("password")) {
+            validate.put("password", 0);
+            helper.executeValidations(field, !value.isEmpty() ? value : password.getText(), lineInvalidPassword, labelInvalidPassword, value, validate);
+        } else if (field.equalsIgnoreCase("confirmPassword")) {
+            validate.put("confirmPassword", 0);
+            helper.executeValidations(field, !value.isEmpty() ? value : confirmPassword.getText(), lineInvalidConfirmPassword, labelInvalidPasswordConfirm, password.getText(), validate);
+        }
     }
 
     private void confirmarEmail(KeyEvent event) {
@@ -162,86 +269,7 @@ public class SignUpController {
         }
     }
 
-    public static Map<String, String> leerCsv() {
-        Map<String, String> datos = new HashMap<>();
-
-        try (BufferedReader reader = new BufferedReader(new FileReader(".\\src\\resources\\paises.csv"))) {
-            String linea;
-            while ((linea = reader.readLine()) != null) {
-                String[] partes = linea.split(",");
-                String clave = partes[1].replaceAll("^\"|\"$", ""); // Elimina comillas
-                String valor = partes[5].replaceAll("^\"|\"$", ""); // Elimina comillas
-                String acronimo = partes[3].replaceAll("^\"|\"$", ""); // Elimina comillas
-                if (!clave.equals(" name")) {
-                    datos.put(clave, valor);
-                    acronimos.put(valor, acronimo);
-                }
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return datos;
-    }
-
-    private void focusedChangeEmail(ObservableValue observable, Boolean oldValue, Boolean newValue) {
-        if (oldValue) {
-            if (!textFieldEmail.isFocused()) {
-                boolean match = false;
-                Pattern pattern = Pattern.compile(emailPattern);
-                Matcher matcher = pattern.matcher(textFieldEmail.getText());
-                if (matcher.find()) {
-                    match = true;
-                }
-                try {
-                    if (!match) {
-                        throw new InvalidEmailValueException("Invalid format of email (*@*.*)");
-                    }
-                    lineInvalidEmail.setStroke(Color.GREY);
-                    labelInvalidEmail.setText("");
-
-                } catch (InvalidEmailValueException ex) {
-                    LOGGER.info(ex.getMessage());
-                    lineInvalidEmail.setStroke(Color.RED);
-                    labelInvalidEmail.setText(ex.getMessage());
-
-                }
-            }
-        }
-    }
-
-    private void focusedChangePhone(ObservableValue observable, Boolean oldValue, Boolean newValue) {
-        if (oldValue) {
-            if (!textFieldPhone.isFocused()) {
-                try {
-                    if (textFieldPhone.getText().isEmpty()) {
-                        throw new InvalidPhoneNumberException("Phone number can´t be empty");
-                    }
-                    if (textFieldPhone.getText().contains(" ")) {
-                        throw new InvalidPhoneNumberException("Phone can´t contains blank spaces");
-                    }
-                    PhoneNumberUtil phoneUtil = PhoneNumberUtil.getInstance();
-                    PhoneNumber numberProto = phoneUtil.parse(textFieldPhone.getText(), acronimos.get(comboPhone.getValue()));
-
-                    // Verificar si el número es válido
-                    boolean isValid = phoneUtil.isValidNumber(numberProto);
-
-                    if (!isValid) {
-                        throw new InvalidPhoneNumberException("Format of phone number is incorrect ");
-                    }
-                    lineInvalidPhone.setStroke(Color.GRAY);
-                    labelInvalidPhone.setText("");
-                } catch (InvalidPhoneNumberException ex) {
-                    lineInvalidPhone.setStroke(Color.RED);
-                    LOGGER.info(ex.getMessage());
-                    labelInvalidPhone.setText(ex.getMessage());
-                } catch (NumberParseException ex) {
-                    Logger.getLogger(SignUpController.class.getName()).log(Level.SEVERE, null, ex);
-                }
-            }
-        }
-    }
-
-    private void SignIn() {
+    private void SignIn(ActionEvent event) {
         try {
             stage.close();
             LOGGER.info("SignUp window closed");
@@ -259,40 +287,44 @@ public class SignUpController {
         }
     }
 
-    /**
-     * Check what state (pressed/not pressed) the password is in.
-     *
-     * @param event an ActionEvent.ACTION event type for when the button is
-     * pressed
-     */
-    private void handleShowHide(ActionEvent event) {
-        if (buttonShowHide.isSelected()) {
-            imageViewButton.setImage(new Image(getClass().getResourceAsStream("/resources/iconEye2.png")));
-            password.setVisible(false);
-            textFieldPassword.setVisible(true);
-        } else {
-            // Si no está presionado se muestra un passwordField y la imagen de imageShowHide es showIcon.
-            imageViewButton.setImage(new Image(getClass().getResourceAsStream("/resources/iconEye.png")));
-            password.setVisible(true);
-            textFieldPassword.setVisible(false);
-        }
-    }
-
     private void Welcome(ActionEvent event) {
         try {
-            stage.close();
-            LOGGER.info("SignUp window closed");
-            FXMLLoader loader = new FXMLLoader(getClass().getClassLoader().getResource("view/Welcome.fxml"));
-            Parent root = (Parent) loader.load();
 
-            WelcomeController controller = ((WelcomeController) loader.getController());
+            password.setVisible(true);
+            confirmPassword.setVisible(true);
+            for (Map.Entry<String, Integer> entry : validate.entrySet()) {
+                if (entry.getValue() == 0) {
+                    opc = entry.getKey();
+                    focusChange(null, Boolean.TRUE, Boolean.FALSE);
+                }
+            }
+            if (quantityValuesZero != 0) {
+                throw new CommonException("");
+            }
+            Model model = ModelFactory.getModel();
+            User user = new User(textFieldEmail.getText(), textFieldName.getText(), textFieldDirection.getText(), Integer.parseInt(textFieldCode.getText()), Integer.parseInt(textFieldPhone.getText()), textFieldPassword.getText());
+            model.doSignUp(user);
+            try {
+                stage.close();
+                LOGGER.info("SignUp window closed");
+                FXMLLoader loader = new FXMLLoader(getClass().getClassLoader().getResource("view/Welcome.fxml"));
+                Parent root = (Parent) loader.load();
 
-            controller.setStage(new Stage());
+                WelcomeController controller = ((WelcomeController) loader.getController());
 
-            controller.initStage(root);
-            LOGGER.info("Welcome window opened");
-        } catch (IOException ex) {
+                controller.setStage(new Stage());
 
-        }
+                controller.initStage(root);
+
+                LOGGER.info("Welcome window opened");
+            } catch (Exception ex) {
+                Logger.getLogger(SignInController.class.getName()).log(Level.SEVERE, null, ex);
+            }
+
+        } catch (CommonException | UserExistException | ConnectionErrorException | TimeOutException | MaxConnectionException ex) {
+            Alert alert = new Alert(Alert.AlertType.ERROR, ex.getMessage());
+            alert.show();
+            LOGGER.log(Level.SEVERE, ex.getMessage());
+        } 
     }
 }

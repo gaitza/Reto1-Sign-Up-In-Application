@@ -1,3 +1,25 @@
+<<<<<<< OURS
+<?xml version="1.0" encoding="utf-8"?>
+<jnlp spec="1.0" xmlns:jfx="http://javafx.com" href="RetoSignInSignUpClient.jnlp">
+  <information>
+    <title>RetoSignInSignUpClient</title>
+    <vendor>bayro</vendor>
+    <description>null</description>
+    <offline-allowed/>
+  </information>
+  <resources>
+    <j2se version="1.6+" href="http://java.sun.com/products/autodl/j2se"/>
+    <jar href="RetoSignInSignUpClient.jar" size="1816693" download="eager" />
+    <jar href="lib\RetoSignInSignUpLibrary.jar" size="13402" download="eager" />
+    <jar href="lib\java-build-1.0-SNAPSHOT-jar-with-dependencies.jar" size="534403" download="eager" />
+  </resources>
+  <applet-desc  width="800" height="600" main-class="com.javafx.main.NoJavaFXFallback"  name="RetoSignInSignUpClient" >
+    <param name="requiredFXVersion" value="8.0+"/>
+  </applet-desc>
+  <jfx:javafx-desc  width="800" height="600" main-class="main.AppFX"  name="RetoSignInSignUpClient" />
+  <update check="always"/>
+</jnlp>
+=======
 <?xml version="1.0" encoding="utf-8"?>
 <jnlp spec="1.0" xmlns:jfx="http://javafx.com" href="RetoSignInSignUpClient.jnlp">
   <information>
@@ -18,3 +40,4 @@
   <jfx:javafx-desc  width="800" height="600" main-class="main.AppFX"  name="RetoSignInSignUpClient" />
   <update check="always"/>
 </jnlp>
+>>>>>>> THEIRS
