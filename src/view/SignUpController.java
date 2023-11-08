@@ -32,6 +32,7 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Hyperlink;
 import javafx.scene.control.PasswordField;
@@ -42,6 +43,7 @@ import javafx.scene.input.KeyEvent;
 import javafx.scene.shape.Line;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
+import javafx.stage.WindowEvent;
 import model.ModelFactory;
 
 /**
@@ -199,6 +201,8 @@ public class SignUpController {
         buttonShowHideConfirm.setOnAction(this::handleShowHide);
         stage.show();
 
+        stage.setOnCloseRequest(this::handleExitAction);
+
         LOGGER.info("SingUp window initialized");
     }
 
@@ -247,7 +251,7 @@ public class SignUpController {
             }
             if (event.getSource() instanceof TextField) {
                 TextField textField = (TextField) event.getSource();
-                 System.out.println(textField.getText());
+                System.out.println(textField.getText());
                 callValidation(textField.getId(), textField.getText());
             }
         }
@@ -335,6 +339,23 @@ public class SignUpController {
         }
     }
 
+    private void handleExitAction(WindowEvent event) {
+        Alert a = new Alert(Alert.AlertType.CONFIRMATION, "Are you sure you want to exit? This will close the app.");
+        a.showAndWait();
+        try {
+            if (a.getResult().equals(ButtonType.CANCEL)) {
+                event.consume();
+            } else {
+                Platform.exit();
+            }
+        } catch (Exception e) {
+            String msg = "Error closing the app: " + e.getMessage();
+            Alert alert = new Alert(Alert.AlertType.ERROR, msg);
+            alert.show();
+            LOGGER.log(Level.SEVERE, msg);
+        }
+    }
+
     /**
      * Abre la ventana SignIn y cierra la actual
      *
@@ -343,17 +364,24 @@ public class SignUpController {
      */
     private void SignIn(ActionEvent event) {
         try {
-            stage.close();
-            LOGGER.info("SignUp window closed");
-            FXMLLoader loader = new FXMLLoader(getClass().getClassLoader().getResource("view/SignIn.fxml"));
-            Parent root = (Parent) loader.load();
+            Alert a = new Alert(Alert.AlertType.CONFIRMATION, "Are you sure you want to exit?.You will lose the data entered");
+            a.showAndWait();
+            if (a.getResult().equals(ButtonType.CANCEL)) {
+                event.consume();
+            } else {
+                stage.close();
+                LOGGER.info("SignUp window closed");
+                FXMLLoader loader = new FXMLLoader(getClass().getClassLoader().getResource("view/SignIn.fxml"));
+                Parent root = (Parent) loader.load();
 
-            SignInController controller = ((SignInController) loader.getController());
+                SignInController controller = ((SignInController) loader.getController());
 
-            controller.setStage(new Stage());
+                controller.setStage(new Stage());
 
-            controller.initStage(root);
-            LOGGER.info("SignIn window opened");
+                controller.initStage(root);
+                LOGGER.info("SignIn window opened");
+            }
+
         } catch (IOException ex) {
             Logger.getLogger(SignInController.class.getName()).log(Level.SEVERE, null, ex);
         }

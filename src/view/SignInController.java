@@ -12,6 +12,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javafx.application.Platform;
 import javafx.beans.property.ReadOnlyBooleanProperty;
 import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
@@ -22,6 +23,7 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.Hyperlink;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
@@ -32,6 +34,7 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Line;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
+import javafx.stage.WindowEvent;
 import model.ModelFactory;
 
 /**
@@ -141,6 +144,8 @@ public class SignInController {
         //Aplica la accion de ver la contraseña
         buttonShowHide.setOnAction(this::handleShowHide);
         
+        stage.setOnCloseRequest(this::handleExitAction);
+        
         stage.show();
         LOGGER.info("SingIn window initialized");
 
@@ -190,6 +195,22 @@ public class SignInController {
         helper.copyPassword(passwordSignIn, textFieldPassword);
     }
 
+     private void handleExitAction(WindowEvent event) {
+        Alert a = new Alert(Alert.AlertType.CONFIRMATION, "Are you sure you want to exit? This will close the app.");
+        a.showAndWait();
+        try {
+            if (a.getResult().equals(ButtonType.CANCEL)) {
+                event.consume();
+            } else {
+                Platform.exit();
+            }
+        } catch (Exception e) {
+            String msg = "Error closing the app: " + e.getMessage();
+            Alert alert = new Alert(Alert.AlertType.ERROR, msg);
+            alert.show();
+            LOGGER.log(Level.SEVERE, msg);
+        }
+    }
     /**
      * Comprueba si el texto tiene menos de 30 caracteres. Si llega al maximo no
      * permite ingresar mas y consume el evento del teclado
