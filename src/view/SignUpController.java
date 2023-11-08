@@ -104,7 +104,7 @@ public class SignUpController {
 
         stage.setTitle("SignUp");
         stage.setResizable(false);
-        System.out.println(quantityValuesZero);
+      
         // HyperLnk //
         //Accion de dirigir a la ventana de SignUp
         hyperLinkSignIn.setOnAction(this::SignIn);
@@ -307,11 +307,11 @@ public class SignUpController {
             try {
                 stage.close();
                 LOGGER.info("SignUp window closed");
-                FXMLLoader loader = new FXMLLoader(getClass().getClassLoader().getResource("view/Welcome.fxml"));
+                FXMLLoader loader = new FXMLLoader(getClass().getClassLoader().getResource("view/SignIn.fxml"));
                 Parent root = (Parent) loader.load();
 
-                WelcomeController controller = ((WelcomeController) loader.getController());
-
+                SignInController controller = ((SignInController) loader.getController());
+                
                 controller.setStage(new Stage());
 
                 controller.initStage(root);

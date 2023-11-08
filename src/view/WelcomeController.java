@@ -5,6 +5,7 @@
  */
 package view;
 
+import DataTransferObjects.User;
 import java.io.IOException;
 import java.util.logging.Logger;
 import javafx.fxml.FXML;
@@ -20,20 +21,19 @@ import javafx.stage.Stage;
  * @author Gaizka
  */
 public class WelcomeController {
-    
+
     private Stage stage;
-    
+    private User user;
+
     private static final Logger LOGGER = Logger.getLogger("WelcomeController.class");
-    
+
     @FXML
     private Label labelUsu;
     @FXML
     private Label labelWelcome;
     @FXML
     private Button btnContinue;
-    
-    
-    
+
     public Stage getStage() {
         return stage;
     }
@@ -41,28 +41,28 @@ public class WelcomeController {
     public void setStage(Stage stage) {
         this.stage = stage;
     }
-    
+   
     /**
      * Method that initialises the window.
      *
      * @param root path of the window
      */
-    public void initStage (Parent root) {
-        
+    public void initStage(Parent root) {
+
         Scene scene = new Scene(root);
 
         stage.setScene(scene);
 
         stage.setTitle("Welcome");
         stage.setResizable(false);
-        
+
         // LabelUsu //
-        labelUsu.setText("¡@Usuario has iniciado sesion correctamente!");
+        labelUsu.setText(" has iniciado sesion correctamente!");
         // LabelWelcome //
         labelWelcome.setText("Muchas Gracias por elegir nuestra aplicacion");
         // btnContinue //
         btnContinue.setOnAction(event -> SignUp());
-        
+
         stage.show();
         LOGGER.info("Welcome window initialized");
     }
@@ -84,5 +84,5 @@ public class WelcomeController {
 
         }
     }
-    
+
 }

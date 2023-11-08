@@ -48,7 +48,7 @@ public class SignInController {
     private Stage stage;
 
     private static final Logger LOGGER = Logger.getLogger("SignInController.class");
-
+    private String parametro = " ";
     @FXML
     private TextField textFieldEmail, textFieldPassword;
     @FXML
@@ -89,6 +89,10 @@ public class SignInController {
         this.stage = stage;
     }
 
+    public void setParametro(String parametro) {
+        this.parametro = parametro;
+    }
+
     /**
      * Method that initialises the window.
      *
@@ -102,6 +106,7 @@ public class SignInController {
         stage.setTitle("SignIn");
         stage.setResizable(false);
 
+        textFieldEmail.setText(parametro);
         // HyperLnk //
         //Action of directing to the SignUp window
         hyperLinkSignUp.setOnAction(this::SignUp);
@@ -221,7 +226,7 @@ public class SignInController {
                 Parent root = (Parent) loader.load();
 
                 WelcomeController controller = ((WelcomeController) loader.getController());
-
+               
                 controller.setStage(new Stage());
 
                 controller.initStage(root);
