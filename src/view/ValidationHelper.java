@@ -16,14 +16,12 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.function.UnaryOperator;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
-import javafx.scene.control.TextFormatter;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -150,34 +148,19 @@ public class ValidationHelper {
                     acronimos.put(valor, acronimo);
                 }
             }
-        } catch (Exception e) {
-            e.printStackTrace();
+        } catch (Exception ex) {
+            Logger.getLogger(SignInController.class.getName()).log(Level.SEVERE, null, ex);
         }
         return datos;
-    }
-
-    public void formatEmailTextField(TextField textFieldEmail) {
-        UnaryOperator<TextFormatter.Change> filter = change -> {
-            String newText = change.getControlNewText();
-            if (newText.endsWith("@h")) {
-                change.setText("hotmail.com");
-                change.setCaretPosition(change.getCaretPosition() + "otmail.com".length());
-            } else if (newText.endsWith("@g")) {
-                change.setText("gmail.com");
-                change.setCaretPosition(change.getCaretPosition() + "mail.com".length());
-            }
-            return change;
-        };
-
-        TextFormatter<String> textFormatter = new TextFormatter<>(filter);
-        textFieldEmail.setTextFormatter(textFormatter);
     }
 
     /**
      * Check what state (pressed/not pressed) the password is in.
      *
-     * @param event an ActionEvent.ACTION event type for when the button is
-     * pressed
+     * @param buttonShowHide
+     * @param imageViewButton
+     * @param password
+     * @param textFieldPassword
      */
     public void togglePasswordFieldVisibility(ToggleButton buttonShowHide, ImageView imageViewButton, PasswordField password, TextField textFieldPassword) {
         if (buttonShowHide.isSelected()) {
@@ -266,7 +249,7 @@ public class ValidationHelper {
 
                     line.setStroke(Color.GREY);
                     label.setText("");
-                    
+
                     validate.put("password", 1);
                 } catch (InvalidPasswordException | CommonException ex) {
                     LOGGER.info(ex.getMessage());
@@ -282,7 +265,7 @@ public class ValidationHelper {
 
                     line.setStroke(Color.GREY);
                     label.setText("");
-                    
+
                     validate.put("confirmPassword", 1);
                 } catch (InvalidPasswordException | CommonException ex) {
                     LOGGER.info(ex.getMessage());

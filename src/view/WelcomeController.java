@@ -8,6 +8,7 @@ package view;
 import DataTransferObjects.User;
 import java.io.IOException;
 import java.util.logging.Logger;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -23,8 +24,8 @@ import javafx.stage.Stage;
 public class WelcomeController {
 
     private Stage stage;
+  
     private User user;
-
     private static final Logger LOGGER = Logger.getLogger("WelcomeController.class");
 
     @FXML
@@ -32,7 +33,7 @@ public class WelcomeController {
     @FXML
     private Label labelWelcome;
     @FXML
-    private Button btnContinue;
+    private Button btnCerrarSesion;
 
     public Stage getStage() {
         return stage;
@@ -41,7 +42,9 @@ public class WelcomeController {
     public void setStage(Stage stage) {
         this.stage = stage;
     }
-   
+    public void setUser(User user){
+        this.user = user;
+    }
     /**
      * Method that initialises the window.
      *
@@ -57,17 +60,17 @@ public class WelcomeController {
         stage.setResizable(false);
 
         // LabelUsu //
-        labelUsu.setText(" has iniciado sesion correctamente!");
+        labelUsu.setText(user.getEmail() + " has iniciado sesion correctamente!");
         // LabelWelcome //
         labelWelcome.setText("Muchas Gracias por elegir nuestra aplicacion");
         // btnContinue //
-        btnContinue.setOnAction(event -> SignUp());
+        btnCerrarSesion.setOnAction(this::SignUp);
 
         stage.show();
         LOGGER.info("Welcome window initialized");
     }
 
-    private void SignUp() {
+    private void SignUp(ActionEvent event) {
         try {
             stage.close();
             LOGGER.info("Welcome window closed");

@@ -46,7 +46,7 @@ import model.ModelFactory;
 public class SignInController {
 
     private Stage stage;
-
+   
     private static final Logger LOGGER = Logger.getLogger("SignInController.class");
     private String parametro = " ";
     @FXML

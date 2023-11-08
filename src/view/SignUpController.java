@@ -104,7 +104,7 @@ public class SignUpController {
 
         stage.setTitle("SignUp");
         stage.setResizable(false);
-      
+
         // HyperLnk //
         //Accion de dirigir a la ventana de SignUp
         hyperLinkSignIn.setOnAction(this::SignIn);
@@ -126,8 +126,6 @@ public class SignUpController {
             }
         });
 
-        helper.formatEmailTextField(textFieldEmail);
-
         password.setOnKeyReleased(this::copyPassword);
         password.setOnKeyTyped(this::updateLabel);
         password.focusedProperty().addListener(this::focusChange);
@@ -137,7 +135,6 @@ public class SignUpController {
         textFieldPassword.setOnKeyTyped(this::updateLabel);
 
         textFieldEmail.focusedProperty().addListener(this::focusChange);
-        textFieldEmail.setOnKeyPressed(this::confirmarEmail);
         textFieldEmail.setOnKeyTyped(this::updateLabel);
 
         textFieldPhone.focusedProperty().addListener(this::focusChange);
@@ -246,18 +243,6 @@ public class SignUpController {
         }
     }
 
-    private void confirmarEmail(KeyEvent event) {
-        if (event.getCode() == KeyCode.ENTER) {
-            textFieldEmail.selectRange(0, 0); // Desseleccionar
-            event.consume(); // Prevenir que se procese el evento de tecla Enter
-        } else if (event.getCode() == KeyCode.BACK_SPACE && textFieldEmail.getSelection() != null) {
-            textFieldEmail.deleteText(textFieldEmail.getSelection());
-        } else if (event.getCode() == KeyCode.BACK_SPACE) {
-            int caretPosition = textFieldEmail.getCaretPosition();
-            textFieldEmail.deleteText(caretPosition - 1, caretPosition);
-        }
-    }
-
     private void mostrarClaveSeleccionada(String newValue, ComboBox comboPhone) {
         for (Map.Entry<String, String> entry : prefijosTelefonos.entrySet()) {
             if (entry.getKey().equals(newValue)) {
@@ -283,7 +268,7 @@ public class SignUpController {
             controller.initStage(root);
             LOGGER.info("SignIn window opened");
         } catch (IOException ex) {
-
+            Logger.getLogger(SignInController.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 
@@ -311,7 +296,7 @@ public class SignUpController {
                 Parent root = (Parent) loader.load();
 
                 SignInController controller = ((SignInController) loader.getController());
-                
+
                 controller.setStage(new Stage());
 
                 controller.initStage(root);
@@ -325,6 +310,6 @@ public class SignUpController {
             Alert alert = new Alert(Alert.AlertType.ERROR, ex.getMessage());
             alert.show();
             LOGGER.log(Level.SEVERE, ex.getMessage());
-        } 
+        }
     }
 }
