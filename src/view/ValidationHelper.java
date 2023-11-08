@@ -174,6 +174,12 @@ public class ValidationHelper {
         }
     }
 
+    /**
+     * Copy text from one field to another
+     *
+     * @param password
+     * @param textFieldPassword
+     */
     public void copyPassword(PasswordField password, TextField textFieldPassword) {
         if (password.isVisible()) {
             textFieldPassword.setText(password.getText());
