@@ -1,6 +1,7 @@
 package Test;
 
 import java.util.concurrent.TimeoutException;
+import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 import main.AppFX;
 import org.junit.BeforeClass;
@@ -46,14 +47,29 @@ public class SignInControllerIT extends ApplicationTest {
         FxToolkit.setupApplication(AppFX.class);
         
    }
+    
+    // Método personalizado para borrar un TextField por su identificador
+    private void clearTextField(String textFieldId) {
+        // Usando lookup, busca el TextField por su identificador
+        TextField textField = lookup(textFieldId).query();
+
+        // Borra el contenido del TextField
+        interact(() -> {
+            textField.clear();
+        });
+
+        // Verifica que el TextField esté vacío
+        verifyThat(textField, hasText(""));
+    }
+    
     /**
      * Test of initial state of login view.
      */
     
     @Test
     public void test1_InitialState() {
-        verifyThat("#textFieldUser", hasText(""));
-        verifyThat("#password",hasText(""));
+        verifyThat("#textFieldEmail", hasText(""));
+        verifyThat("#passwordSignIn",hasText(""));
         verifyThat("#buttonSignIn", isDisabled());
     }
     
@@ -62,16 +78,16 @@ public class SignInControllerIT extends ApplicationTest {
     */
     
     @Test
-    public void test2_AceptarIsDisabled() {
-        clickOn("#textFieldUser");
+    public void test2_ButtonSignUpIsDisabled() {
+        clickOn("#textFieldEmail");
         write("administrator@gmail.com");
-        //verifyThat("#buttonSignIn", isDisabled());
-        eraseText(23);
-        clickOn("#password");
+        verifyThat("#buttonSignIn", isDisabled());
+        clearTextField("#textFieldEmail");
+        clickOn("#passwordSignIn");
         write("abcd*1234");
-        //verifyThat("#buttonSignIn", isDisabled());
-        eraseText(9);
-        //verifyThat("#buttonSignIn", isDisabled());
+        verifyThat("#buttonSignIn", isDisabled());
+        clearTextField("#passwordSignIn");
+        verifyThat("#buttonSignIn", isDisabled());
         
         
     }
@@ -81,16 +97,12 @@ public class SignInControllerIT extends ApplicationTest {
     */ 
     
     @Test
-    public void test3_AceptarIsEnabled() {
-        clickOn("#textFieldUser");
+    public void test3_ButtonSignUpIsEnabled() {
+        clickOn("#textFieldEmail");
         write("administrator@gmail.com");
-        clickOn("#password");
+        clickOn("#passwordSignIn");
         write("abcd*1234");
         verifyThat("#buttonSignIn", isEnabled());
-        clickOn("#textFieldUser");
-        eraseText(23);
-        clickOn("#password");
-        eraseText(9);
     }
     
     /**
@@ -99,17 +111,13 @@ public class SignInControllerIT extends ApplicationTest {
     */
     
     @Test
-    public void test4_UsersViewOpenedOnAceptarClick() {
-        clickOn("#textFieldUser");
+    public void test4_UsersViewOpenedOnButtonSignUpClick() {
+        clickOn("#textFieldEmail");
         write("administrator@gmail.com");
-        clickOn("#password");
+        clickOn("#passwordSignIn");
         write("abcd*1234");
         clickOn("#buttonSignIn");
         verifyThat("#usersViewPane", isVisible());
-        clickOn("#textFieldUser");
-        eraseText(23);
-        clickOn("#password");
-        eraseText(9);
     }
 
 }
