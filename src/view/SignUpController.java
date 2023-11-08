@@ -64,9 +64,9 @@ public class SignUpController {
     @FXML
     private PasswordField password, confirmPassword;
     @FXML
-    private ToggleButton buttonShowHide;
+    private ToggleButton buttonShowHide, buttonShowHideConfirm;
     @FXML
-    private ImageView imageViewButton;
+    private ImageView imageViewButton, imageViewButtonConfirm;
     @FXML
     private Button buttonSignUp;
 
@@ -196,7 +196,7 @@ public class SignUpController {
 
         //Accion para mostrar u ocultar la contraseña
         buttonShowHide.setOnAction(this::handleShowHide);
-
+        buttonShowHideConfirm.setOnAction(this::handleShowHide);
         stage.show();
 
         LOGGER.info("SingUp window initialized");
@@ -209,7 +209,12 @@ public class SignUpController {
      * está presionado
      */
     private void copyPassword(KeyEvent event) {
-        helper.copyPassword(password, textFieldPassword);
+        String sourceId = ((Node) event.getSource()).getId();
+        if (sourceId.equals("password") || sourceId.equals("textFieldPassword")) {
+            helper.copyPassword(password, textFieldPassword);
+        } else {
+            helper.copyPassword(confirmPassword, textFieldConfirmPassword);
+        }
     }
 
     /**
@@ -219,7 +224,12 @@ public class SignUpController {
      * está presionado
      */
     private void handleShowHide(ActionEvent event) {
-        helper.togglePasswordFieldVisibility(buttonShowHide, imageViewButton, password, textFieldPassword);
+        String sourceId = ((Node) event.getSource()).getId();
+        if (sourceId.equals("buttonShowHide")) {
+            helper.togglePasswordFieldVisibility(buttonShowHide, imageViewButton, password, textFieldPassword);
+        } else {
+            helper.togglePasswordFieldVisibility(buttonShowHideConfirm, imageViewButtonConfirm, confirmPassword, textFieldConfirmPassword);
+        }
     }
 
     /**

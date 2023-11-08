@@ -140,7 +140,7 @@ public class SignInController {
 
         //Aplica la accion de ver la contraseña
         buttonShowHide.setOnAction(this::handleShowHide);
-
+        
         stage.show();
         LOGGER.info("SingIn window initialized");
 
