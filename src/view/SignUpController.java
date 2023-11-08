@@ -147,50 +147,50 @@ public class SignUpController {
         //Copia la contraseña.
         password.setOnKeyReleased(this::copyPassword);
         //Para actualizar el label en caso de que sea el ultimo campo sin validar.
-        password.setOnKeyTyped(this::updateLabel);
+        password.setOnKeyReleased(this::updateLabel);
 
         // Comprueba si cambia el foco.
         textFieldPassword.focusedProperty().addListener(this::focusChange);
         textFieldPassword.setOnKeyReleased(this::copyPassword);
         //Para actualizar el label en caso de que sea el ultimo campo sin validar.
-        textFieldPassword.setOnKeyTyped(this::updateLabel);
+        textFieldPassword.setOnKeyReleased(this::updateLabel);
 
         // Comprueba si cambia el foco.
         textFieldEmail.focusedProperty().addListener(this::focusChange);
         //Para actualizar el label en caso de que sea el ultimo campo sin validar.
-        textFieldEmail.setOnKeyTyped(this::updateLabel);
+        textFieldEmail.setOnKeyReleased(this::updateLabel);
 
         // Comprueba si cambia el foco.
         textFieldPhone.focusedProperty().addListener(this::focusChange);
         //Para actualizar el label en caso de que sea el ultimo campo sin validar.
-        textFieldPhone.setOnKeyTyped(this::updateLabel);
+        textFieldPhone.setOnKeyReleased(this::updateLabel);
 
         // Comprueba si cambia el foco.
         textFieldCode.focusedProperty().addListener(this::focusChange);
         //Para actualizar el label en caso de que sea el ultimo campo sin validar.
-        textFieldCode.setOnKeyTyped(this::updateLabel);
+        textFieldCode.setOnKeyReleased(this::updateLabel);
 
         // Comprueba si cambia el foco.
         textFieldName.focusedProperty().addListener(this::focusChange);
         //Para actualizar el label en caso de que sea el ultimo campo sin validar.
-        textFieldName.setOnKeyTyped(this::updateLabel);
+        textFieldName.setOnKeyReleased(this::updateLabel);
 
         // Comprueba si cambia el foco.
         textFieldDirection.focusedProperty().addListener(this::focusChange);
         //Para actualizar el label en caso de que sea el ultimo campo sin validar.
-        textFieldDirection.setOnKeyTyped(this::updateLabel);
+        textFieldDirection.setOnKeyReleased(this::updateLabel);
 
         //Copia la contraseña
         textFieldConfirmPassword.setOnKeyReleased(this::copyPassword);
         //Para actualizar el label en caso de que sea el ultimo campo sin validar.
-        textFieldConfirmPassword.setOnKeyTyped(this::updateLabel);
+        textFieldConfirmPassword.setOnKeyReleased(this::updateLabel);
         // Comprueba si cambia el foco.
         textFieldConfirmPassword.focusedProperty().addListener(this::focusChange);
 
         //Copia la contraseña
         confirmPassword.setOnKeyReleased(this::copyPassword);
         //Para actualizar el label en caso de que sea el ultimo campo sin validar.
-        confirmPassword.setOnKeyTyped(this::updateLabel);
+        confirmPassword.setOnKeyReleased(this::updateLabel);
         // Comprueba si cambia el foco.
         confirmPassword.focusedProperty().addListener(this::focusChange);
 
@@ -247,6 +247,7 @@ public class SignUpController {
             }
             if (event.getSource() instanceof TextField) {
                 TextField textField = (TextField) event.getSource();
+                 System.out.println(textField.getText());
                 callValidation(textField.getId(), textField.getText());
             }
         }
