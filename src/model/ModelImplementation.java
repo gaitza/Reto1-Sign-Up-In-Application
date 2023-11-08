@@ -27,6 +27,8 @@ import java.util.logging.Logger;
 
 /**
  *
+ * Implementacion del modelo.
+ *
  * @author bayro
  */
 public class ModelImplementation implements Model {
@@ -40,10 +42,11 @@ public class ModelImplementation implements Model {
     private static final Logger LOGGER = Logger.getLogger("ModelImplementation");
 
     /**
-     * Method that takes a user from the view and sends a package to the server
+     * Metodo que recoge un usuario de la vista y envia un paquete al servidor
+     * con dicho usuario y el mensaje de SignIn
      *
-     * @param user Class that has all data from a user
-     * @return p Class that contains a user and a MessageEnum
+     * @param user Clase con todos los datos del usuario necesarios
+     * @return p Clase que contiene el usuario y un mensaje del servidor.
      * @throws exceptions.InvalidUserException
      * @throws exceptions.MaxConnectionException
      * @throws exceptions.ConnectionErrorException
@@ -93,9 +96,10 @@ public class ModelImplementation implements Model {
     }
 
     /**
-     * Method that takes a user from the view and sends a package to the server
+     * *Metodo que recoge un usuario de la vista y envia un paquete al servidor
+     * con dicho usuario y el mensaje de SignUp
      *
-     * @param user Class that has all data from a user
+     * @param user Clase con todos los datos del usuario necesarios
      * @throws exceptions.MaxConnectionException
      * @throws exceptions.ConnectionErrorException
      * @throws exceptions.UserExistException

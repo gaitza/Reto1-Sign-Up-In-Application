@@ -30,6 +30,7 @@ import javafx.scene.shape.Line;
 import javafx.scene.text.Text;
 
 /**
+ * Clase para realizar todas las validaciones en SignIn y SinUpController
  *
  * @author bayro
  */
@@ -37,6 +38,16 @@ public class ValidationHelper {
 
     private static final Logger LOGGER = Logger.getLogger("SignUpController.class");
 
+    /**
+     * Validaciones que son comunes para varios campos
+     *
+     * @param strng string a validar
+     * @param email boolean para saber si es un email y no aplicarle la
+     * validacion de caracter especiales.
+     * @param spaces boolean para aplicar o no la validacion de espacios en
+     * blanco.
+     * @throws exceptions.CommonException
+     */
     public void commomValidations(String strng, boolean email, boolean spaces) throws CommonException {
         if (strng.isEmpty()) {
             throw new CommonException("empty");
@@ -58,6 +69,15 @@ public class ValidationHelper {
         }
     }
 
+    /**
+     * Validaciones especificas para el campo textFieldPhoneNumber
+     *
+     * @param number string con el telefono a validar.
+     * @param acro acronimo del pais para enviarlo a PhoneNumber
+     * @throws exceptions.CommonException
+     * @throws exceptions.InvalidPhoneNumberException
+     * @throws com.google.i18n.phonenumbers.NumberParseException
+     */
     public void phoneNumberValidation(String number, String acro) throws CommonException, InvalidPhoneNumberException, NumberParseException {
         Pattern pattern = Pattern.compile("[a-zA-Z]");
         Matcher matcher = pattern.matcher(number);
@@ -76,7 +96,7 @@ public class ValidationHelper {
         System.out.println(acro);
         System.out.println(number);
         Phonenumber.PhoneNumber numberProto = phoneUtil.parse(number, acro);
-        // Check if the number is valid
+        //Comprueba si el numero cumple el formato especifico.
         boolean isValid = phoneUtil.isValidNumber(numberProto);
 
         if (!isValid) {
@@ -84,6 +104,13 @@ public class ValidationHelper {
         }
     }
 
+    /**
+     * Validaciones especificas para el textFieldEmail
+     *
+     * @param email string con el email a validar.
+     * @throws exceptions.InvalidEmailValueException
+     *
+     */
     public void emailValidation(String email) throws InvalidEmailValueException {
 
         boolean match = false;
@@ -97,6 +124,13 @@ public class ValidationHelper {
         }
     }
 
+    /**
+     * Validaciones especificas para el textFieldCode.
+     *
+     * @param code el valor del campo a validar.
+     * @throws exceptions.CommonException
+     *
+     */
     public void codeValidation(String code) throws CommonException {
         Pattern pattern = Pattern.compile("[a-zA-Z]");
         Matcher matcher = pattern.matcher(code);
@@ -110,9 +144,16 @@ public class ValidationHelper {
         }
     }
 
-    public void nameValidation(String code) throws CommonException {
+    /**
+     * Validaciones especificas para el textFieldNAme
+     *
+     * @param name
+     * @throws exceptions.CommonException
+     *
+     */
+    public void nameValidation(String name) throws CommonException {
         Pattern pattern = Pattern.compile("^[^0-9]+$");
-        Matcher matcher = pattern.matcher(code);
+        Matcher matcher = pattern.matcher(name);
 
         boolean match = false;
         if (matcher.find()) {
@@ -123,6 +164,15 @@ public class ValidationHelper {
         }
     }
 
+    /**
+     * Validaciones especificas para la contraseña
+     *
+     * @param password string con la contraseña
+     * @param confirmPassword string con la contraseña a confirmar
+     * @throws exceptions.CommonException
+     * @throws exceptions.InvalidPasswordException
+     *
+     */
     public void passwordValidation(String password, String confirmPassword) throws CommonException, InvalidPasswordException {
 
         if (password.length() < 8) {
@@ -133,6 +183,13 @@ public class ValidationHelper {
         }
     }
 
+    /**
+     * Metodo para leer el archivo csv que contiene todos los acronimos.
+     *
+     * @param acronimos
+     * @return devuelve un map con todos datos del csv.
+     *
+     */
     public Map<String, String> readCsv(Map acronimos) {
         Map<String, String> datos = new HashMap<>();
 
@@ -155,7 +212,9 @@ public class ValidationHelper {
     }
 
     /**
-     * Check what state (pressed/not pressed) the password is in.
+     * Comprueba si esta presionado el boton de mostrar contraseña y muestra el
+     * PasswordField o el textField segun corresponda Ademas de cambiar la
+     * imagen del ojito.
      *
      * @param buttonShowHide
      * @param imageViewButton
@@ -175,7 +234,7 @@ public class ValidationHelper {
     }
 
     /**
-     * Copy text from one field to another
+     * Copia el texto de la contraseña de un campo a otro como corresponda.
      *
      * @param password
      * @param textFieldPassword
@@ -188,6 +247,20 @@ public class ValidationHelper {
         }
     }
 
+    /**
+     * Ejecuta las validaciones comunes asi como las especificas del campo,
+     * dependiendo del id que reciba.
+     *
+     *
+     * @param opc id del campo a validar
+     * @param value valor del campo a validar
+     * @param line Line para ponerlo en rojo, especifico del campo a validar.
+     * @param label label del campo a validar para enseñar el mensaje de error
+     * si procede.
+     * @param acro acronimo para enviar al campo de validar telefono
+     * @param validate Map con los campos para cambiar a 1 si ha completado
+     * exitosamente todas las validacioens.
+     */
     public void executeValidations(String opc, String value, Line line, Text label, String acro, Map<String, Integer> validate) {
 
         switch (opc) {

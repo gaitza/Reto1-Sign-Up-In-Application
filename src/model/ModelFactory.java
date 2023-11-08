@@ -8,10 +8,12 @@ package model;
 import DataTransferObjects.Model;
 
 /**
+ * Factoria del modelo.
  *
  * @author bayro
  */
 public class ModelFactory {
+
     private static Model model;
 
     public static Model getModel() {

@@ -243,8 +243,8 @@ public class SignInController {
      * ningun error mandao al model, un user con los campos correctos y si este
      * no devuelve errores abrira la ventana welcome y cerrara esta.
      *
-     * @param event an ActionEvent.ACTION event type for when the button is
-     * pressed
+     * @param event un tipo de evento ActionEvent.ACTION para cuando el botón
+     * está presionado
      */
     private void Welcome(ActionEvent event) {
         try {
