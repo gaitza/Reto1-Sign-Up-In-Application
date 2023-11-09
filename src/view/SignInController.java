@@ -131,8 +131,6 @@ public class SignInController {
         // PASSWORD FIELD //
         // Comprueba si cambia el foco.
         passwordSignIn.setOnKeyReleased(this::copyPassword);
-        //Limita los caracteres a 30
-        passwordSignIn.setOnKeyTyped(this::textChanged);
         //Comprueba si cambia el foco en el passwordField
         passwordSignIn.focusedProperty().addListener(this::focusedChange);
 
@@ -281,7 +279,7 @@ public class SignInController {
                 }
                 //Lanzo una excepcion para parar la ejecucion del codigo.
                 //Avisando al usuario mas tarde con un alert de que algun dato es incorrecto.
-                throw new CommonException("");
+                throw new CommonException("data");
             }
             Model model = ModelFactory.getModel();
             //Instancio un usuario y le doy los valores recogidos.

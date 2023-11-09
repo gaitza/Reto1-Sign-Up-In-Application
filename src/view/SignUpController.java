@@ -147,13 +147,13 @@ public class SignUpController {
         // Comprueba si cambia el foco.
         password.focusedProperty().addListener(this::focusChange);
         //Copia la contraseña.
-        password.setOnKeyReleased(this::copyPassword);
+
         //Para actualizar el label en caso de que sea el ultimo campo sin validar.
         password.setOnKeyReleased(this::updateLabel);
 
         // Comprueba si cambia el foco.
         textFieldPassword.focusedProperty().addListener(this::focusChange);
-        textFieldPassword.setOnKeyReleased(this::copyPassword);
+
         //Para actualizar el label en caso de que sea el ultimo campo sin validar.
         textFieldPassword.setOnKeyReleased(this::updateLabel);
 
@@ -161,6 +161,7 @@ public class SignUpController {
         textFieldEmail.focusedProperty().addListener(this::focusChange);
         //Para actualizar el label en caso de que sea el ultimo campo sin validar.
         textFieldEmail.setOnKeyReleased(this::updateLabel);
+        textFieldEmail.setOnKeyTyped(this::textChanged);
 
         // Comprueba si cambia el foco.
         textFieldPhone.focusedProperty().addListener(this::focusChange);
@@ -182,15 +183,13 @@ public class SignUpController {
         //Para actualizar el label en caso de que sea el ultimo campo sin validar.
         textFieldDirection.setOnKeyReleased(this::updateLabel);
 
-        //Copia la contraseña
-        textFieldConfirmPassword.setOnKeyReleased(this::copyPassword);
+        //Copia la contraseña y 
         //Para actualizar el label en caso de que sea el ultimo campo sin validar.
         textFieldConfirmPassword.setOnKeyReleased(this::updateLabel);
         // Comprueba si cambia el foco.
         textFieldConfirmPassword.focusedProperty().addListener(this::focusChange);
 
-        //Copia la contraseña
-        confirmPassword.setOnKeyReleased(this::copyPassword);
+        //Copia la contraseña y
         //Para actualizar el label en caso de que sea el ultimo campo sin validar.
         confirmPassword.setOnKeyReleased(this::updateLabel);
         // Comprueba si cambia el foco.
@@ -205,19 +204,18 @@ public class SignUpController {
 
         LOGGER.info("SingUp window initialized");
     }
-
-    /**
-     * Llama al helper para copiar la contraseña.
+    
+      /**
+     * Comprueba si el texto tiene menos de 30 caracteres. Si llega al maximo no
+     * permite ingresar mas y consume el evento del teclado
      *
      * @param event un tipo de evento ActionEvent.ACTION para cuando el botón
      * está presionado
      */
-    private void copyPassword(KeyEvent event) {
-        String sourceId = ((Node) event.getSource()).getId();
-        if (sourceId.equals("password") || sourceId.equals("textFieldPassword")) {
-            helper.copyPassword(password, textFieldPassword);
-        } else {
-            helper.copyPassword(confirmPassword, textFieldConfirmPassword);
+    private void textChanged(KeyEvent event) {
+        if (((TextField) event.getSource()).getText().length() >= 30) {
+            event.consume();
+            ((TextField) event.getSource()).setText(((TextField) event.getSource()).getText().substring(0, 30));
         }
     }
 
@@ -238,7 +236,8 @@ public class SignUpController {
 
     /**
      * Comprueba si la cantidad de campos no validados es igual a 1. Si es asi
-     * realiza las comprobaciones conforme cambia el valor del campo.
+     * realiza las comprobaciones conforme cambia el valor del campo. Y tambien
+     * Llama al helper para copiar la contraseña.
      *
      * @param event un tipo de evento ActionEvent.ACTION para cuando el botón
      * está presionado
@@ -254,6 +253,12 @@ public class SignUpController {
                 System.out.println(textField.getText());
                 callValidation(textField.getId(), textField.getText());
             }
+        }
+        String sourceId = ((Node) event.getSource()).getId();
+        if (sourceId.equals("password") || sourceId.equals("textFieldPassword")) {
+            helper.copyPassword(password, textFieldPassword);
+        } else {
+            helper.copyPassword(confirmPassword, textFieldConfirmPassword);
         }
     }
 
@@ -413,7 +418,7 @@ public class SignUpController {
             //Si quantityValuesZero es distinto a 0 es que hay algun campo que no cumple los requisitos y por tanto esta mal
             //Lanzo la excepcion para detener la ejecución del codigo.
             if (quantityValuesZero != 0) {
-                throw new CommonException("");
+                throw new CommonException("data");
             }
             Model model = ModelFactory.getModel();
             User user = new User(textFieldEmail.getText(), textFieldName.getText(), textFieldDirection.getText(), Integer.parseInt(textFieldCode.getText()), Integer.parseInt(textFieldPhone.getText()), textFieldPassword.getText());

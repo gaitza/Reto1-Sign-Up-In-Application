@@ -178,6 +178,26 @@ public class ValidationHelper {
         if (password.length() < 8) {
             throw new InvalidPasswordException("Password must be al least 8 characters long");
         }
+        Pattern letter = Pattern.compile("[a-zA-z]");
+        Pattern special = Pattern.compile("[!@#$%&*()_+=|<>?{}\\[\\]~-]");
+        boolean letters = false;
+
+        Matcher hasLetter = letter.matcher(password);
+        Matcher haveSpecial = special.matcher(password);
+        boolean specialCh = false;
+        
+        if (hasLetter.find()) {
+            letters = true;
+        }
+        if(haveSpecial.find()) {
+            specialCh = true;
+        }
+        if(!specialCh) { 
+            throw new InvalidPasswordException("Passwords must have one special character.");
+        }
+        if (!letters) {
+            throw new InvalidPasswordException("Passwords must have one letter");
+        }
         if (!confirmPassword.equals(password)) {
             throw new InvalidPasswordException("Passwords must match");
         }
@@ -323,7 +343,7 @@ public class ValidationHelper {
                 break;
             case "password":
                 try {
-                    commomValidations(value, false, false);
+                    commomValidations(value, true, false);
                     passwordValidation(value, acro);
 
                     line.setStroke(Color.GREY);
@@ -339,7 +359,7 @@ public class ValidationHelper {
                 break;
             case "confirmPassword":
                 try {
-                    commomValidations(value, false, false);
+                    commomValidations(value, true, false);
                     passwordValidation(value, acro);
 
                     line.setStroke(Color.GREY);
@@ -368,7 +388,7 @@ public class ValidationHelper {
                 break;
             case "passwordSignIn":
                 try {
-                    commomValidations(value, false, false);
+                    commomValidations(value, true, false);
 
                     line.setStroke(Color.GREY);
                     label.setText("");
@@ -383,5 +403,5 @@ public class ValidationHelper {
                 break;
         }
     }
-    
+
 }
