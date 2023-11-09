@@ -1,9 +1,13 @@
 package Test;
 
 import java.util.concurrent.TimeoutException;
+import javafx.application.Platform;
+import javafx.scene.Node;
 import javafx.scene.control.TextField;
+import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import main.AppFX;
+import static org.junit.Assert.assertEquals;
 import org.junit.BeforeClass;
 import org.junit.FixMethodOrder;
 import org.junit.Test;
@@ -62,15 +66,27 @@ public class SignInControllerIT extends ApplicationTest {
         verifyThat(textField, hasText(""));
     }
     
+    // Método personalizado para la aserción
+    private void assertTextContent(String expectedText, Text text) {
+        // Verifica que el objeto text no sea null antes de acceder a sus propiedades
+        if (text != null) {
+            assertEquals(expectedText, text.getText());
+        } else {
+            throw new AssertionError("El objeto Text es nulo");
+        }
+    }
+    
     /**
      * Test of initial state of login view.
      */
     
     @Test
-    public void test1_InitialState() {
-        verifyThat("#textFieldEmail", hasText(""));
-        verifyThat("#passwordSignIn",hasText(""));
-        verifyThat("#buttonSignIn", isDisabled());
+    public void test1_EyeShowPassword() {
+        clickOn("#passwordSignIn");
+        write("abcd*1234");
+        clickOn("#imageViewButton");
+        clickOn("#imageViewButton");
+        clearTextField("#passwordSignIn");
     }
     
     /**
@@ -78,18 +94,23 @@ public class SignInControllerIT extends ApplicationTest {
     */
     
     @Test
-    public void test2_ButtonSignUpIsDisabled() {
+    public void test2_SignInError() {
         clickOn("#textFieldEmail");
         write("administrator@gmail.com");
-        verifyThat("#buttonSignIn", isDisabled());
+        clickOn("#buttonSignIn");
+        verifyThat("Some data is wrong", Node::isVisible);
+        clickOn("Aceptar");
         clearTextField("#textFieldEmail");
         clickOn("#passwordSignIn");
         write("abcd*1234");
-        verifyThat("#buttonSignIn", isDisabled());
+        clickOn("#buttonSignIn");
+        verifyThat("Some data is wrong", Node::isVisible);
+        clickOn("Aceptar");
         clearTextField("#passwordSignIn");
-        verifyThat("#buttonSignIn", isDisabled());
-        
-        
+        clickOn("#buttonSignIn");
+        verifyThat("Some data is wrong", Node::isVisible);
+        clickOn("Aceptar");
+   
     }
     
     /**
@@ -97,12 +118,20 @@ public class SignInControllerIT extends ApplicationTest {
     */ 
     
     @Test
-    public void test3_ButtonSignUpIsEnabled() {
-        clickOn("#textFieldEmail");
-        write("administrator@gmail.com");
+    public void test3_LabelError() {
         clickOn("#passwordSignIn");
         write("abcd*1234");
-        verifyThat("#buttonSignIn", isEnabled());
+        clickOn("#buttonSignIn");
+        verifyThat("Some data is wrong", Node::isVisible);
+        clickOn("Aceptar");
+        clearTextField("#textFieldEmail");
+        Platform.runLater(() -> {
+            Text text = lookup("#labelInvalidUser").query();
+            assertTextContent("This field can´t contains blank spaces", text);
+        });
+        clickOn("#textFieldEmail");
+        write("administrator@gmail.com");
+        clickOn("#buttonSignIn");
     }
     
     /**
@@ -111,14 +140,16 @@ public class SignInControllerIT extends ApplicationTest {
     */
     
     @Test
-    public void test4_UsersViewOpenedOnButtonSignUpClick() {
+    public void test4_UsersViewOpenedOnButtonSignInClick() {
+        clearTextField("#textFieldEmail");
+        clearTextField("#passwordSignIn");
         clickOn("#textFieldEmail");
         write("administrator@gmail.com");
         clickOn("#passwordSignIn");
         write("abcd*1234");
         clickOn("#buttonSignIn");
-        verifyThat("#usersViewPane", isVisible());
+        verifyThat("#btnContinuar", isVisible());
     }
-
+    
 }
 

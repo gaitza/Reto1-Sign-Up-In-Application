@@ -7,15 +7,24 @@ package Test;
 
 import java.util.concurrent.TimeoutException;
 import javafx.application.Platform;
+import javafx.scene.Node;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
+import javafx.scene.control.TextInputControl;
+import javafx.scene.text.Text;
 import main.AppFX;
+import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.not;
+import org.hamcrest.Matcher;
+import org.junit.Assert;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThat;
 import org.junit.BeforeClass;
 import org.junit.FixMethodOrder;
 import org.junit.Test;
 import org.junit.runners.MethodSorters;
+import org.testfx.api.FxAssert;
 import static org.testfx.api.FxAssert.verifyThat;
 import org.testfx.api.FxToolkit;
 import org.testfx.framework.junit.ApplicationTest;
@@ -69,10 +78,7 @@ public class SignUpControllerIT extends ApplicationTest {
         // Verifica que el TextField esté vacío
         verifyThat(textField, hasText(""));
     }
-    
-    private void verifyLabelIsFilled(String labelId) {
-        verifyThat(labelId, hasText(""));
-    }
+
     
      private void selectComboBoxOption(String comboBoxId, String optionToSelect) {
         // Busca el ComboBox por su identificador
@@ -88,69 +94,95 @@ public class SignUpControllerIT extends ApplicationTest {
         //clickOn(comboBox);
     }
 
-    
+    // Método personalizado para la aserción
+    private void assertTextContent(String expectedText, Text text) {
+        // Verifica que el objeto text no sea null antes de acceder a sus propiedades
+        if (text != null) {
+            assertEquals(expectedText, text.getText());
+        } else {
+            throw new AssertionError("El objeto Text es nulo");
+        }
+    }
 
     /**
      * Test of initial state of login view.
      */
-    /*
+     
+    
     @Test
-    public void test1_InitialState() {
+    public void test1_EyeShowPassword() {
         clickOn("#hyperLinkSignUp");
-        verifyThat("#textFieldEmail", hasText(""));
-        verifyThat("#textFieldName", hasText(""));
-        verifyThat("#textFieldPhone", hasText(""));
-        verifyThat("#textFieldDirection", hasText(""));
-        verifyThat("#textFieldCode", hasText(""));
-        verifyThat("#password", hasText(""));
-        verifyThat("#confirmPassword",hasText(""));
-        verifyThat("#buttonSignUp", isDisabled());
+        clickOn("#password");
+        write("abcd*1234");
+        clickOn("#imageViewButton");
+        clickOn("#confirmPassword");
+        write("abcd*1234");
+        clickOn("#imageViewButtonConfirm");
+        clickOn("#imageViewButton");
+        clickOn("#imageViewButtonConfirm");
+        clearTextField("#password");
+        clearTextField("#confirmPassword");
     }
-    */
-    /*
+    
+    
     @Test
-    public void test2_ButtonSignInIsDisabled() {
-        //clickOn("#hyperLinkSignUp");
+    public void test2_SignUpError() {
         clickOn("#textFieldEmail");
         write("administrator@gmail.com");
-        verifyThat("#buttonSignIn", isDisabled());
+        clickOn("#buttonSignUp");
+        verifyThat("Some data is wrong", Node::isVisible);
+        clickOn("Aceptar");
         clearTextField("#textFieldEmail");
         clickOn("#textFieldName");
         write("administrator");
-        verifyThat("#textFieldName", isDisabled());
+        clickOn("#buttonSignUp");
+        verifyThat("Some data is wrong", Node::isVisible);
+        clickOn("Aceptar");
         clearTextField("#textFieldName");
         clickOn("#textFieldPhone");
         write("625314895");
-        verifyThat("#textFieldName", isDisabled());
+        clickOn("#buttonSignUp");
+        verifyThat("Some data is wrong", Node::isVisible);
+        clickOn("Aceptar");
         clearTextField("#textFieldPhone");
         clickOn("#textFieldDirection");
         write("erandio");
-        verifyThat("#textFieldName", isDisabled());
+        clickOn("#buttonSignUp");
+        verifyThat("Some data is wrong", Node::isVisible);
+        clickOn("Aceptar");
         clearTextField("#textFieldDirection");
         clickOn("#textFieldCode");
         write("42153");
-        verifyThat("#textFieldName", isDisabled());
+        clickOn("#buttonSignUp");
+        verifyThat("Some data is wrong", Node::isVisible);
+        clickOn("Aceptar");
         clearTextField("#textFieldCode");
         clickOn("#password");
         write("abcd*1234");
-        verifyThat("#textFieldName", isDisabled());
+        clickOn("#buttonSignUp");
+        verifyThat("Some data is wrong", Node::isVisible);
+        clickOn("Aceptar");
         clearTextField("#password");
         clickOn("#confirmPassword");
         write("abcd*1234");
-        verifyThat("#buttonSignIn", isDisabled());
+        clickOn("#buttonSignUp");
+        verifyThat("Some data is wrong", Node::isVisible);
+        clickOn("Aceptar");
         clearTextField("#confirmPassword");
-        verifyThat("#buttonSignIn", isDisabled());
+        clickOn("#buttonSignUp");
+        verifyThat("Some data is wrong", Node::isVisible);
+        clickOn("Aceptar");
         
         
     }
-    */
+     
+    
+    
     @Test
-    public void test3_ButtonSignInIsEnabled() {
-        clickOn("#hyperLinkSignUp");
+    public void test3_LabelError() {
         clickOn("#textFieldEmail");
-        write("administrator@gmail.com");
+        write("Markel@gmail.com");
         Platform.runLater(() -> {
-        // Coloca aquí el código que interactúa con la interfaz de usuario
         selectComboBoxOption("#comboPhone", "Spain");
         });
         clickOn("#textFieldPhone");
@@ -164,19 +196,29 @@ public class SignUpControllerIT extends ApplicationTest {
         clickOn("#confirmPassword");
         write("abcd*1234");
         clickOn("#buttonSignUp");
-        clickOn("#Aceptar");
-        verifyLabelIsFilled("#labelInvalidUser");
+        verifyThat("Some data is wrong", Node::isVisible);
+        clickOn("Aceptar");
+        Platform.runLater(() -> {
+            Text text = lookup("#labelInvalidName").query();
+            assertTextContent("This field can´t be blank", text);
+        });
         clickOn("#textFieldName");
         write("administrator");
-        verifyThat("#buttonSignUp", isEnabled());
+        clickOn("#buttonSignUp");
+        
     }
-    /*
+    
+    
+    
     @Test
-    public void test4_UsersViewOpenedOnButtonSignInClick() {
+    public void test4_UsersViewOpenedOnButtonSignUpClick() {
         clickOn("#textFieldEmail");
         write("administrator@gmail.com");
         clickOn("#textFieldName");
         write("administrator");
+        Platform.runLater(() -> {
+        selectComboBoxOption("#comboPhone", "Spain");
+        });
         clickOn("#textFieldPhone");
         write("625314895");
         clickOn("#textFieldDirection");
@@ -188,7 +230,9 @@ public class SignUpControllerIT extends ApplicationTest {
         clickOn("#confirmPassword");
         write("abcd*1234");
         clickOn("#buttonSignUp");
-        verifyThat("#Welcome.fxml", isVisible());
+        verifyThat("#btnContinuar", isVisible());
     }
-*/
+    
+
+   
 }
