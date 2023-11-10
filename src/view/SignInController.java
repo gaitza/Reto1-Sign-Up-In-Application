@@ -294,7 +294,7 @@ public class SignInController {
                 Parent root = (Parent) loader.load();
 
                 WelcomeController controller = ((WelcomeController) loader.getController());
-
+                controller.setUser(user);
                 controller.setStage(new Stage());
 
                 controller.initStage(root);
