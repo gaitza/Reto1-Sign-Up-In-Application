@@ -68,8 +68,6 @@ public class SignInController {
     private ToggleButton buttonShowHide;
     @FXML
     private ImageView imageViewButton;
-
-    private Color customColorGreen = Color.web("#14FF0D");
     String opc;
     //Map para verificar que campos estan validados. 0 es que no esta validado y si se cambia a 1 es que esta validado.
     Map<String, Integer> validate = new HashMap<String, Integer>() {
