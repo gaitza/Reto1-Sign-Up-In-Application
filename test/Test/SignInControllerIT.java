@@ -95,12 +95,14 @@ public class SignInControllerIT extends ApplicationTest {
     
     @Test
     public void test2_SignInError() {
+        clickOn("#passwordSignIn");
         clickOn("#textFieldEmail");
-        write("administrator@gmail.com");
+        write("erichu@gmail.com");
         clickOn("#buttonSignIn");
         verifyThat("Some data is wrong", Node::isVisible);
         clickOn("Aceptar");
         clearTextField("#textFieldEmail");
+        clickOn("#textFieldEmail");
         clickOn("#passwordSignIn");
         write("abcd*1234");
         clickOn("#buttonSignIn");
@@ -127,11 +129,14 @@ public class SignInControllerIT extends ApplicationTest {
         clearTextField("#textFieldEmail");
         Platform.runLater(() -> {
             Text text = lookup("#labelInvalidUser").query();
-            assertTextContent("This field can´t contains blank spaces", text);
+            assertTextContent("This field can´t be blank", text);
         });
         clickOn("#textFieldEmail");
-        write("administrator@gmail.com");
+        write("erichu@gmail.com");
         clickOn("#buttonSignIn");
+        verifyThat("#btnCerrarSesion", isVisible());
+        clickOn("#btnCerrarSesion");
+        clickOn("Aceptar");
     }
     
     /**
@@ -141,14 +146,16 @@ public class SignInControllerIT extends ApplicationTest {
     
     @Test
     public void test4_UsersViewOpenedOnButtonSignInClick() {
+        clickOn("#hyperLinkSignIn");
+        clickOn("Aceptar");
         clearTextField("#textFieldEmail");
         clearTextField("#passwordSignIn");
         clickOn("#textFieldEmail");
-        write("administrator@gmail.com");
+        write("erichu@gmail.com");
         clickOn("#passwordSignIn");
         write("abcd*1234");
         clickOn("#buttonSignIn");
-        verifyThat("#btnContinuar", isVisible());
+        verifyThat("#btnCerrarSesion", isVisible());
     }
     
 }
