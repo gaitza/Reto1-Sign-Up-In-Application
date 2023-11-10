@@ -32,17 +32,18 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Hyperlink;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.image.ImageView;
-import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.shape.Line;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
+import javafx.stage.WindowEvent;
 import model.ModelFactory;
 
 /**
@@ -65,14 +66,17 @@ public class SignUpController {
     @FXML
     private PasswordField password, confirmPassword;
     @FXML
-    private ToggleButton buttonShowHide;
+    private ToggleButton buttonShowHide, buttonShowHideConfirm;
     @FXML
-    private ImageView imageViewButton;
+    private ImageView imageViewButton, imageViewButtonConfirm;
     @FXML
     private Button buttonSignUp;
 
+    //Map para los prefijos de los telefonos.
     private Map<String, String> prefijosTelefonos;
+    //Map para los acronimos, ya que la api solo funciona con estos.
     private static Map<String, String> acronimos = new HashMap<>();
+    //Map para verificar luego las verificaciones.
     Map<String, Integer> validate = new HashMap<String, Integer>() {
         {
             put("textFieldPhone", 0);
@@ -85,7 +89,9 @@ public class SignUpController {
         }
     };
     private String opc;
+    //Long para contar si hay algun campo sin validar.
     long quantityValuesZero = validate.values().stream().filter(valor -> valor == 0).count();
+    //Helper para validar los campos
     private final ValidationHelper helper = new ValidationHelper();
     private static final Logger LOGGER = Logger.getLogger("SignUpController.class");
 
@@ -93,10 +99,20 @@ public class SignUpController {
         return stage;
     }
 
+    /**
+     * Establece la instancia de Stage asociada a este controlador.
+     *
+     * @param stage La instancia de Stage que se asignará a este controlador.
+     */
     public void setStage(Stage stage) {
         this.stage = stage;
     }
 
+    /**
+     * Metodo que inicializa la ventana
+     *
+     * @param root
+     */
     public void initStage(Parent root) {
         Scene scene = new Scene(root);
 
@@ -104,7 +120,7 @@ public class SignUpController {
 
         stage.setTitle("SignUp");
         stage.setResizable(false);
-        System.out.println(quantityValuesZero);
+
         // HyperLnk //
         //Accion de dirigir a la ventana de SignUp
         hyperLinkSignIn.setOnAction(this::SignIn);
@@ -113,8 +129,9 @@ public class SignUpController {
         //Accion de dirigir a la ventana de Welcome
         buttonSignUp.setOnAction(this::Welcome);
 
+        //Cargo en el map los prefijos y numeros
         prefijosTelefonos = helper.readCsv(acronimos);
-
+        //Las ordeno para mostrarlas ordenadas
         List<String> claveOrdenadas = new ArrayList<>(prefijosTelefonos.keySet());
         Collections.sort(claveOrdenadas);
         comboPhone.getItems().addAll(claveOrdenadas);
@@ -126,61 +143,105 @@ public class SignUpController {
             }
         });
 
-        helper.formatEmailTextField(textFieldEmail);
-
-        password.setOnKeyReleased(this::copyPassword);
-        password.setOnKeyTyped(this::updateLabel);
+        // PASSWORD FIELD //
+        // Comprueba si cambia el foco.
         password.focusedProperty().addListener(this::focusChange);
+        //Copia la contraseña.
 
+        //Para actualizar el label en caso de que sea el ultimo campo sin validar.
+        password.setOnKeyReleased(this::updateLabel);
+
+        // Comprueba si cambia el foco.
         textFieldPassword.focusedProperty().addListener(this::focusChange);
-        textFieldPassword.setOnKeyReleased(this::copyPassword);
-        textFieldPassword.setOnKeyTyped(this::updateLabel);
 
+        //Para actualizar el label en caso de que sea el ultimo campo sin validar.
+        textFieldPassword.setOnKeyReleased(this::updateLabel);
+
+        // Comprueba si cambia el foco.
         textFieldEmail.focusedProperty().addListener(this::focusChange);
-        textFieldEmail.setOnKeyPressed(this::confirmarEmail);
-        textFieldEmail.setOnKeyTyped(this::updateLabel);
+        //Para actualizar el label en caso de que sea el ultimo campo sin validar.
+        textFieldEmail.setOnKeyReleased(this::updateLabel);
+        textFieldEmail.setOnKeyTyped(this::textChanged);
 
+        // Comprueba si cambia el foco.
         textFieldPhone.focusedProperty().addListener(this::focusChange);
-        textFieldPhone.setOnKeyTyped(this::updateLabel);
+        //Para actualizar el label en caso de que sea el ultimo campo sin validar.
+        textFieldPhone.setOnKeyReleased(this::updateLabel);
 
+        // Comprueba si cambia el foco.
         textFieldCode.focusedProperty().addListener(this::focusChange);
-        textFieldCode.setOnKeyTyped(this::updateLabel);
+        //Para actualizar el label en caso de que sea el ultimo campo sin validar.
+        textFieldCode.setOnKeyReleased(this::updateLabel);
 
+        // Comprueba si cambia el foco.
         textFieldName.focusedProperty().addListener(this::focusChange);
-        textFieldName.setOnKeyTyped(this::updateLabel);
+        //Para actualizar el label en caso de que sea el ultimo campo sin validar.
+        textFieldName.setOnKeyReleased(this::updateLabel);
 
+        // Comprueba si cambia el foco.
         textFieldDirection.focusedProperty().addListener(this::focusChange);
-        textFieldDirection.setOnKeyTyped(this::updateLabel);
+        //Para actualizar el label en caso de que sea el ultimo campo sin validar.
+        textFieldDirection.setOnKeyReleased(this::updateLabel);
 
-        textFieldConfirmPassword.setOnKeyReleased(this::copyPassword);
-        textFieldConfirmPassword.setOnKeyTyped(this::updateLabel);
+        //Copia la contraseña y 
+        //Para actualizar el label en caso de que sea el ultimo campo sin validar.
+        textFieldConfirmPassword.setOnKeyReleased(this::updateLabel);
+        // Comprueba si cambia el foco.
         textFieldConfirmPassword.focusedProperty().addListener(this::focusChange);
 
-        confirmPassword.setOnKeyReleased(this::copyPassword);
-        confirmPassword.setOnKeyTyped(this::updateLabel);
+        //Copia la contraseña y
+        //Para actualizar el label en caso de que sea el ultimo campo sin validar.
+        confirmPassword.setOnKeyReleased(this::updateLabel);
+        // Comprueba si cambia el foco.
         confirmPassword.focusedProperty().addListener(this::focusChange);
 
+        //Accion para mostrar u ocultar la contraseña
         buttonShowHide.setOnAction(this::handleShowHide);
-
+        buttonShowHideConfirm.setOnAction(this::handleShowHide);
         stage.show();
+
+        stage.setOnCloseRequest(this::handleExitAction);
 
         LOGGER.info("SingUp window initialized");
     }
-
-    private void copyPassword(KeyEvent event) {
-        helper.copyPassword(password, textFieldPassword);
+    
+      /**
+     * Comprueba si el texto tiene menos de 30 caracteres. Si llega al maximo no
+     * permite ingresar mas y consume el evento del teclado
+     *
+     * @param event un tipo de evento ActionEvent.ACTION para cuando el botón
+     * está presionado
+     */
+    private void textChanged(KeyEvent event) {
+        if (((TextField) event.getSource()).getText().length() >= 30) {
+            event.consume();
+            ((TextField) event.getSource()).setText(((TextField) event.getSource()).getText().substring(0, 30));
+        }
     }
 
     /**
-     * Check what state (pressed/not pressed) the password is in.
+     * LLama al helper para mostrar la contraseña
      *
-     * @param event an ActionEvent.ACTION event type for when the button is
-     * pressed
+     * @param event un tipo de evento ActionEvent.ACTION para cuando el botón
+     * está presionado
      */
     private void handleShowHide(ActionEvent event) {
-        helper.togglePasswordFieldVisibility(buttonShowHide, imageViewButton, password, textFieldPassword);
+        String sourceId = ((Node) event.getSource()).getId();
+        if (sourceId.equals("buttonShowHide")) {
+            helper.togglePasswordFieldVisibility(buttonShowHide, imageViewButton, password, textFieldPassword);
+        } else {
+            helper.togglePasswordFieldVisibility(buttonShowHideConfirm, imageViewButtonConfirm, confirmPassword, textFieldConfirmPassword);
+        }
     }
 
+    /**
+     * Comprueba si la cantidad de campos no validados es igual a 1. Si es asi
+     * realiza las comprobaciones conforme cambia el valor del campo. Y tambien
+     * Llama al helper para copiar la contraseña.
+     *
+     * @param event un tipo de evento ActionEvent.ACTION para cuando el botón
+     * está presionado
+     */
     private void updateLabel(KeyEvent event) {
         if (quantityValuesZero == 1) {
             if (event.getSource() instanceof PasswordField) {
@@ -189,11 +250,25 @@ public class SignUpController {
             }
             if (event.getSource() instanceof TextField) {
                 TextField textField = (TextField) event.getSource();
+                System.out.println(textField.getText());
                 callValidation(textField.getId(), textField.getText());
             }
         }
+        String sourceId = ((Node) event.getSource()).getId();
+        if (sourceId.equals("password") || sourceId.equals("textFieldPassword")) {
+            helper.copyPassword(password, textFieldPassword);
+        } else {
+            helper.copyPassword(confirmPassword, textFieldConfirmPassword);
+        }
     }
 
+    /**
+     * Comprueba el cambio de foco de los campos
+     *
+     * @param observable Valor actual
+     * @param oldValue Valor viejo
+     * @param newValue Nuevo valor
+     */
     private void focusChange(ObservableValue observable, Boolean oldValue, Boolean newValue) {
         if (oldValue) {
             String field = "";
@@ -219,6 +294,13 @@ public class SignUpController {
         }
     }
 
+    /**
+     * LLama al metodo de ejecutar las validaciones, pasandole los parametros
+     * especificos para cada campo.
+     *
+     * @param field String que contiene el id del campo
+     * @param value String que contiene el valor del campo
+     */
     private void callValidation(String field, String value) {
 
         String acro = acronimos.get(comboPhone.getValue());
@@ -246,71 +328,109 @@ public class SignUpController {
         }
     }
 
-    private void confirmarEmail(KeyEvent event) {
-        if (event.getCode() == KeyCode.ENTER) {
-            textFieldEmail.selectRange(0, 0); // Desseleccionar
-            event.consume(); // Prevenir que se procese el evento de tecla Enter
-        } else if (event.getCode() == KeyCode.BACK_SPACE && textFieldEmail.getSelection() != null) {
-            textFieldEmail.deleteText(textFieldEmail.getSelection());
-        } else if (event.getCode() == KeyCode.BACK_SPACE) {
-            int caretPosition = textFieldEmail.getCaretPosition();
-            textFieldEmail.deleteText(caretPosition - 1, caretPosition);
-        }
-    }
-
+    /**
+     * Como en el comboBox se visualiza el nombre de los paises, aqui busco el
+     * nombre del pais y muestro su prefijo.
+     *
+     * @param newValue
+     * @param comboPhone
+     */
     private void mostrarClaveSeleccionada(String newValue, ComboBox comboPhone) {
         for (Map.Entry<String, String> entry : prefijosTelefonos.entrySet()) {
             if (entry.getKey().equals(newValue)) {
                 Platform.runLater(() -> comboPhone.setValue(entry.getValue()));
-                System.out.println("newValue es : " + newValue);
-                System.out.println("Clave: " + entry.getKey() + " valor: " + entry.getValue());
                 break;
             }
         }
     }
 
-    private void SignIn(ActionEvent event) {
+    private void handleExitAction(WindowEvent event) {
+        Alert a = new Alert(Alert.AlertType.CONFIRMATION, "Are you sure you want to exit? This will close the app.");
+        a.showAndWait();
         try {
-            stage.close();
-            LOGGER.info("SignUp window closed");
-            FXMLLoader loader = new FXMLLoader(getClass().getClassLoader().getResource("view/SignIn.fxml"));
-            Parent root = (Parent) loader.load();
-
-            SignInController controller = ((SignInController) loader.getController());
-
-            controller.setStage(new Stage());
-
-            controller.initStage(root);
-            LOGGER.info("SignIn window opened");
-        } catch (IOException ex) {
-
+            if (a.getResult().equals(ButtonType.CANCEL)) {
+                event.consume();
+            } else {
+                Platform.exit();
+            }
+        } catch (Exception e) {
+            String msg = "Error closing the app: " + e.getMessage();
+            Alert alert = new Alert(Alert.AlertType.ERROR, msg);
+            alert.show();
+            LOGGER.log(Level.SEVERE, msg);
         }
     }
 
+    /**
+     * Abre la ventana SignIn y cierra la actual
+     *
+     * @param event un tipo de evento ActionEvent.ACTION para cuando el botón
+     * está presionado
+     */
+    private void SignIn(ActionEvent event) {
+        try {
+            Alert a = new Alert(Alert.AlertType.CONFIRMATION, "Are you sure you want to exit?.You will lose the data entered");
+            a.showAndWait();
+            if (a.getResult().equals(ButtonType.CANCEL)) {
+                event.consume();
+            } else {
+                stage.close();
+                LOGGER.info("SignUp window closed");
+                FXMLLoader loader = new FXMLLoader(getClass().getClassLoader().getResource("view/SignIn.fxml"));
+                Parent root = (Parent) loader.load();
+
+                SignInController controller = ((SignInController) loader.getController());
+
+                controller.setStage(new Stage());
+
+                controller.initStage(root);
+                LOGGER.info("SignIn window opened");
+            }
+
+        } catch (IOException ex) {
+            Logger.getLogger(SignInController.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+
+    /**
+     * Metodo para ejecutar el registro. Primero comprueba con el long si hay
+     * algun campo sin validar. Si hay algun campo sin validar recorre el array
+     * para validar todos y mostrar los errores correspondientes. Si no hubiera
+     * ningun error mandao al model, un user con los campos correctos y si este
+     * no devuelve errores abrira la ventana SignIn y cerrara esta.
+     *
+     * @param event un tipo de evento ActionEvent.ACTION para cuando el botón
+     * está presionado
+     */
     private void Welcome(ActionEvent event) {
         try {
 
             password.setVisible(true);
             confirmPassword.setVisible(true);
+            //Recorro el map para ver si hay campos sin validar.
             for (Map.Entry<String, Integer> entry : validate.entrySet()) {
+                //Si esta sin validar llamo al metodo focus change que validara el campo.
                 if (entry.getValue() == 0) {
                     opc = entry.getKey();
                     focusChange(null, Boolean.TRUE, Boolean.FALSE);
                 }
             }
+            //Si quantityValuesZero es distinto a 0 es que hay algun campo que no cumple los requisitos y por tanto esta mal
+            //Lanzo la excepcion para detener la ejecución del codigo.
             if (quantityValuesZero != 0) {
-                throw new CommonException("");
+                throw new CommonException("data");
             }
             Model model = ModelFactory.getModel();
             User user = new User(textFieldEmail.getText(), textFieldName.getText(), textFieldDirection.getText(), Integer.parseInt(textFieldCode.getText()), Integer.parseInt(textFieldPhone.getText()), textFieldPassword.getText());
             model.doSignUp(user);
+            //Cierro la ventana actual y abro la ventana de SignIn.
             try {
                 stage.close();
                 LOGGER.info("SignUp window closed");
-                FXMLLoader loader = new FXMLLoader(getClass().getClassLoader().getResource("view/Welcome.fxml"));
+                FXMLLoader loader = new FXMLLoader(getClass().getClassLoader().getResource("view/SignIn.fxml"));
                 Parent root = (Parent) loader.load();
 
-                WelcomeController controller = ((WelcomeController) loader.getController());
+                SignInController controller = ((SignInController) loader.getController());
 
                 controller.setStage(new Stage());
 
@@ -321,10 +441,11 @@ public class SignUpController {
                 Logger.getLogger(SignInController.class.getName()).log(Level.SEVERE, null, ex);
             }
 
+            //Si se lanza alguna excepcion la lanzo en un alert.
         } catch (CommonException | UserExistException | ConnectionErrorException | TimeOutException | MaxConnectionException ex) {
             Alert alert = new Alert(Alert.AlertType.ERROR, ex.getMessage());
             alert.show();
             LOGGER.log(Level.SEVERE, ex.getMessage());
-        } 
+        }
     }
 }
