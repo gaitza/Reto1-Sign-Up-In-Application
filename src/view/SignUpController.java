@@ -431,7 +431,6 @@ public class SignUpController {
                 Parent root = (Parent) loader.load();
 
                 SignInController controller = ((SignInController) loader.getController());
-
                 controller.setStage(new Stage());
 
                 controller.initStage(root);

@@ -47,7 +47,7 @@ public class SignInController {
     private Stage stage;
 
     private static final Logger LOGGER = Logger.getLogger("SignInController.class");
-    private String parametro = " ";
+    private String parametro = "";
     @FXML
     private TextField textFieldEmail, textFieldPassword;
     @FXML
@@ -97,7 +97,6 @@ public class SignInController {
     public void setParametro(String parametro) {
         this.parametro = parametro;
     }
-
     /**
      * Metodo que inicializa la ventana
      *
@@ -244,9 +243,11 @@ public class SignInController {
                 }
 
                 if (field.equals("textFieldEmail")) {
+                    validate.put("textFieldEmail", 0);
                     helper.executeValidations(textFieldEmail.getId(), textFieldEmail.getText(), lineUser, labelInvalidUser, "", validate);
                     //mando siempre el id de passwordSignIn, independientemente de si el metodo lo ha invocado el textfield o el passwordField
                 } else if (field.equals("passwordSignIn") || field.equals("textFieldPassword")) {
+                    validate.put("passwordSignIn", 0);
                     helper.executeValidations(passwordSignIn.getId(), passwordSignIn.getText(), linePassword, labelInvalidPassword, "", validate);
                 }
             }

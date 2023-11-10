@@ -128,13 +128,13 @@ public class SignUpControllerIT extends ApplicationTest {
     @Test
     public void test2_SignUpError() {
         clickOn("#textFieldEmail");
-        write("administrator@gmail.com");
+        write("erichu01@gmail.com");
         clickOn("#buttonSignUp");
         verifyThat("Some data is wrong", Node::isVisible);
         clickOn("Aceptar");
         clearTextField("#textFieldEmail");
         clickOn("#textFieldName");
-        write("administrator");
+        write("eric");
         clickOn("#buttonSignUp");
         verifyThat("Some data is wrong", Node::isVisible);
         clickOn("Aceptar");
@@ -181,12 +181,13 @@ public class SignUpControllerIT extends ApplicationTest {
     @Test
     public void test3_LabelError() {
         clickOn("#textFieldEmail");
-        write("Markel@gmail.com");
+        clickOn("#textFieldName");
+        write("galder");
         Platform.runLater(() -> {
         selectComboBoxOption("#comboPhone", "Spain");
         });
         clickOn("#textFieldPhone");
-        write("625314895");
+        write("625314875");
         clickOn("#textFieldDirection");
         write("erandio");
         clickOn("#textFieldCode");
@@ -199,11 +200,11 @@ public class SignUpControllerIT extends ApplicationTest {
         verifyThat("Some data is wrong", Node::isVisible);
         clickOn("Aceptar");
         Platform.runLater(() -> {
-            Text text = lookup("#labelInvalidName").query();
+            Text text = lookup("#labelInvalidEmail").query();
             assertTextContent("This field can´t be blank", text);
         });
-        clickOn("#textFieldName");
-        write("administrator");
+        clickOn("#textFieldEmail");
+        write("galder@gmail.com");
         clickOn("#buttonSignUp");
         
     }
@@ -212,10 +213,11 @@ public class SignUpControllerIT extends ApplicationTest {
     
     @Test
     public void test4_UsersViewOpenedOnButtonSignUpClick() {
+        clickOn("#hyperLinkSignUp");
         clickOn("#textFieldEmail");
-        write("administrator@gmail.com");
+        write("erichu01@gmail.com");
         clickOn("#textFieldName");
-        write("administrator");
+        write("eric");
         Platform.runLater(() -> {
         selectComboBoxOption("#comboPhone", "Spain");
         });
@@ -230,7 +232,12 @@ public class SignUpControllerIT extends ApplicationTest {
         clickOn("#confirmPassword");
         write("abcd*1234");
         clickOn("#buttonSignUp");
-        verifyThat("#btnContinuar", isVisible());
+        clickOn("#textFieldEmail");
+        write("erichu01@gmail.com");
+        clickOn("#passwordSignIn");
+        write("abcd*1234");
+        clickOn("#buttonSignIn");
+        verifyThat("#btnCerrarSesion", isVisible());
     }
     
 
